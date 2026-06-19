@@ -1,0 +1,20 @@
+{
+  "name": "machine-learning-systems",
+  "displayName": "Machine Learning Systems",
+  "description": "Study and reference guide for Machine Learning Systems design, patterns, architectures, and quantitative invariants.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Antigravity"
+  },
+  "license": "MIT",
+  "keywords": [
+    "machine-learning",
+    "systems-engineering",
+    "hardware-acceleration",
+    "mlops",
+    "model-serving",
+    "compression",
+    "roofline-model"
+  ],
+  "skills": "./skills/"
+}
