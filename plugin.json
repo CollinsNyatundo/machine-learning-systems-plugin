@@ -1,10 +1,19 @@
 {
   "name": "machine-learning-systems",
   "displayName": "Machine Learning Systems",
-  "description": "Study and reference guide for Machine Learning Systems design, patterns, architectures, and quantitative invariants.",
+  "description": "Study and reference guide for Machine Learning Systems design, patterns, architectures, and quantitative invariants. Includes MCP server for universal AI assistant integration.",
   "version": "1.0.0",
   "author": {
-    "name": "Antigravity"
+    "name": "Collins Nyatundo",
+    "email": "cnyagakan@gmail.com"
+  },
+  "source": {
+    "textbook": "Machine Learning Systems",
+    "author": "Vijay Janapa Reddi",
+    "institution": "Harvard John A. Paulson School of Engineering and Applied Sciences",
+    "course": "CS 249r",
+    "url": "https://mlsysbook.ai/",
+    "license": "CC BY-NC-SA 4.0"
   },
   "license": "MIT",
   "keywords": [
@@ -14,7 +23,48 @@
     "mlops",
     "model-serving",
     "compression",
-    "roofline-model"
+    "roofline-model",
+    "mcp",
+    "fastmcp"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "mcp": {
+    "server": "mcp_server.py",
+    "entrypoint": "mcp",
+    "transport": ["stdio", "http"],
+    "default_port": 8000,
+    "requirements": "requirements.txt",
+    "tools": [
+      "search_chapters",
+      "get_definition",
+      "get_artifact",
+      "get_chapter",
+      "get_formula",
+      "list_artifacts",
+      "get_cheatsheet_section"
+    ],
+    "resources": [
+      "ml-systems://index",
+      "ml-systems://glossary",
+      "ml-systems://patterns",
+      "ml-systems://cheatsheet",
+      "ml-systems://skill"
+    ],
+    "prompts": [
+      "study_chapter",
+      "compare_volumes",
+      "design_review",
+      "exam_prep"
+    ]
+  },
+  "installation": {
+    "gemini-cli": "cp -r skills/machine-learning-systems ~/.gemini/config/plugins/",
+    "cursor": "fastmcp install cursor mcp_server.py",
+    "claude-code": "fastmcp install claude-code mcp_server.py",
+    "claude-desktop": "fastmcp install claude-desktop mcp_server.py",
+    "hermes": "Add to ~/.hermes/config.yaml under mcp_servers",
+    "opencode": "Add to ~/.config/opencode/mcp.json",
+    "continue": "Add to ~/.continue/config.json",
+    "manual": "Copy chapters/ folder or use MCP server"
+  }
 }

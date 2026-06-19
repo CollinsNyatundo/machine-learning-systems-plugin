@@ -1,6 +1,6 @@
 ---
 name: machine-learning-systems
-description: "Study and reference guide for Machine Learning Systems design, patterns, architectures, and quantitative invariants (Volume 1 & 2)."
+description: "Study and reference guide for Machine Learning Systems design, patterns, architectures, and quantitative invariants (Volume 1 & 2). Includes MCP server for universal AI assistant integration."
 ---
 
 # Machine Learning Systems Engineering
@@ -18,6 +18,54 @@ Unlike traditional software engineering, ML systems are fundamentally shaped by 
 * **The memory wall** makes moving data (memory bandwidth) far more expensive in latency and energy than executing compute (FLOPs).
 
 Hence, ML engineering is not about making models smaller, but about designing systems that balance these constraints to maximize the **Return on Compute (RoC)**.
+
+---
+
+## 📦 Universal Integration: MCP Server
+
+This plugin includes a **FastMCP server** (`mcp_server.py`) for integration with **every major AI assistant**.
+
+### Quick Install (Any Platform)
+
+```bash
+# 1. Install dependency
+pip install fastmcp
+
+# 2. Test locally
+fastmcp run mcp_server.py:mcp --transport http --port 8000
+
+# 3. Install into your client
+fastmcp install claude-code mcp_server.py
+fastmcp install cursor mcp_server.py
+fastmcp install claude-desktop mcp_server.py
+```
+
+### Platform-Specific Config
+
+| Platform | Config |
+|----------|--------|
+| **Hermes Agent** | Add to `~/.hermes/config.yaml` under `mcp_servers` |
+| **Claude Code** | `fastmcp install claude-code mcp_server.py` |
+| **Cursor** | `fastmcp install cursor mcp_server.py` |
+| **Claude Desktop** | `fastmcp install claude-desktop mcp_server.py` |
+| **Gemini CLI** | Native plugin (below) OR MCP config |
+| **OpenCode** | Add to `~/.config/opencode/mcp.json` |
+| **Continue.dev** | Add to `~/.continue/config.json` |
+| **Aider** | `export AIDER_MCP_ML_SYSTEMS="fastmcp run mcp_server.py:mcp"` |
+| **Sourcegraph Cody** | Add to `~/.cody/mcp.json` |
+| **Neovim** | Use `mcphub.nvim` or `mcp.nvim` plugin |
+| **Zed Editor** | Add to `~/.config/zed/settings.json` |
+| **VS Code Copilot** | Add to `.vscode/mcp.json` |
+
+### MCP Capabilities
+
+| Type | Count | Examples |
+|------|-------|----------|
+| **Tools** | 7 | `search_chapters`, `get_definition`, `get_artifact`, `get_chapter`, `get_formula`, `list_artifacts`, `get_cheatsheet_section` |
+| **Resources** | 5 | `ml-systems://index`, `ml-systems://glossary`, `ml-systems://patterns`, `ml-systems://cheatsheet`, `ml-systems://skill` |
+| **Prompts** | 4 | `study_chapter`, `compare_volumes`, `design_review`, `exam_prep` |
+
+See `INTEGRATIONS.md` for complete documentation.
 
 ---
 
@@ -97,5 +145,59 @@ Hence, ML engineering is not about making models smaller, but about designing sy
 * [Appendix B: Fleet Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appB.md)
 * [Appendix C: Communication Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appC.md)
 * [Appendix D: Reliability Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appD.md)
-* [Appendix E: The C3 Taxonomy](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appE.md)
+* [Appendix E: The C³ Taxonomy](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appE.md)
 * [Appendix F: System Assumptions](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appF.md)
+
+---
+
+## 🔧 Installation Methods
+
+### Gemini CLI (Primary — Native Plugin)
+```bash
+# Clone repo
+git clone https://github.com/CollinsNyatundo/machine-learning-systems-plugin.git
+
+# Install
+cp -r machine-learning-systems-plugin/skills/machine-learning-systems \
+      ~/.gemini/config/plugins/
+
+# Verify
+ls ~/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/
+```
+
+### MCP Server (Universal — All Platforms)
+```bash
+# Install dependency
+pip install fastmcp
+
+# Run server (stdio for direct install, HTTP for remote)
+fastmcp run mcp_server.py:mcp                    # stdio
+fastmcp run mcp_server.py:mcp --transport http --port 8000  # HTTP
+
+# Install into client
+fastmcp install claude-code mcp_server.py
+fastmcp install cursor mcp_server.py
+fastmcp install claude-desktop mcp_server.py
+```
+
+### Manual / Editor-Agnostic
+```bash
+# Just copy the chapters folder anywhere
+cp -r skills/machine-learning-systems/chapters ~/my-ml-reference/
+```
+
+---
+
+## 📚 Source Attribution
+
+| Component | License | Attribution |
+|-----------|---------|-------------|
+| **Source Textbook** | CC BY-NC-SA 4.0 | "Machine Learning Systems" by Vijay Janapa Reddi, Harvard SEAS — [mlsysbook.ai](https://mlsysbook.ai/) |
+| **Course Material** | Educational | CS 249r: Machine Learning Systems, Harvard |
+| **Plugin & MCP Server** | MIT | Free to use, modify, distribute |
+| **Docling** | Apache 2.0 | PDF → markdown conversion — [ds4sd/docling](https://github.com/docling-project/docling) |
+| **FastMCP** | MIT | MCP server framework — [gofastmcp.com](https://gofastmcp.com) |
+
+---
+
+*Generated from the complete "Machine Learning Systems" textbook via deterministic docling extraction. Every definition, formula, worked example, and architectural insight preserved from source.*
