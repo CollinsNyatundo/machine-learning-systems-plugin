@@ -77,7 +77,7 @@ Vol 2 — Distribution, Serving & Governance (23 files)
 └── v2_appF.md  — System Assumptions
 ```
 
-> **Note**: The source textbook Vol 2 has no chapter 4 (skips from ch03 to ch05). This plugin preserves the original numbering.
+> **Note**: The source textbook Vol 2 has no chapter 3 content (skips from ch03 to ch04). This plugin combines both ch03 and ch04 into 1 (ch03).
 
 ### 4 Top-Level Reference Files
 | File | Description |
