@@ -1,7 +1,7 @@
 # Machine Learning Systems Plugin
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Plugin Version](https://img.shields.io/badge/version-1.0.0-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-1.1.0-blue.svg)]()
 [![Chapters](https://img.shields.io/badge/chapters-44-brightgreen.svg)]()
 [![Artifacts](https://img.shields.io/badge/named_artifacts-820-orange.svg)]()
 
@@ -175,7 +175,8 @@ cp -r machine-learning-systems-plugin/skills/machine-learning-systems/chapters \
    - Prepends original summary section ("Section-by-Section Preserve-and-Extend")
 3. **Parity Audit**: `audit_vol1_rebuild.py` verifies 100% artifact coverage
 4. **Top-Level Regeneration**: Patterns, glossary, cheatsheet extracted from final chapters
-5. **Quality**: 113% average byte ratio (plugin ≥ slice), 0 missing artifacts
+5. **Math Placeholder & LaTeX Resolution**: Resolved 354 mathematical comment placeholders (`<!-- formula-not-decoded -->`) and raw dollar-sign math wrappers using a background validation pipeline. Enforced strict math delimiters (`\(` and `\)` for inline, `\[` and `\]` for display) and normalized Greek/Unicode characters across all 44 chapters.
+6. **Quality**: 113% average byte ratio (plugin ≥ slice), 0 missing artifacts
 
 **Artifacts preserved**: `/tmp/merge_vol1_chapters.py`, `/tmp/audit_vol1_rebuild.py`, `/tmp/backup_vol1/`
 
