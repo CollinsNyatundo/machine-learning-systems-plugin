@@ -610,7 +610,7 @@ Algorithm and Machine share the compute term, separated by which variable the en
 operations ( 𝑂 ) is an Algorithm lever, while improving the hardware's peak throughput ( 𝑅 peak ) or utilization ( 𝜂 hw
 ) is a Machine lever.
 
-<!-- formula-not-decoded -->
+\[ T = \frac{D_{\text{vol}}}{\text{BW}} + \frac{O}{R_{\text{peak}} \cdot \eta_{\text{hw}}} + L_{\text{lat}} \]
 
 This equation transforms performance debugging from a qualitative guessing game into a quantitative engineering problem.
 Every bottleneck hides in one of these terms. A slow system is one that is moving too much data ( 𝐷 vol ), lacking
@@ -629,7 +629,9 @@ Skilled systems engineering, however, transforms the sum into a max:
 - Machine Lever: Increasing the denominator of the compute term by improving peak throughput ( 𝑅 peak ) or increasing
 the utilization factor ( 𝜂 hw ) via kernel fusion. A.3.2 D·A·M coordination: From sum to max
 
-<!-- formula-not-decoded -->
+\[
+T_{\text{sequential}} = \frac{D_{\text{vol}}}{\text{BW}} + \frac{O}{R_{\text{peak}} \cdot \eta_{\text{hw}}} + L_{\text{lat}} \;\longrightarrow\; T_{\text{pipelined}} = \max\!\left(\frac{D_{\text{vol}}}{\text{BW}},\, \frac{O}{R_{\text{peak}} \cdot \eta_{\text{hw}}}\right) + L_{\text{lat}}
+\]
 
 The systems engineer's job is to make these components run in parallel, not in series. Table A.3 summarizes key D·A·M
 Coordination techniques:
@@ -935,11 +937,11 @@ system Data-bound, Algorithm-bound, or Machine-bound? Justify your answer. Answe
 
 Then calculate utilization:
 
-<!-- formula-not-decoded -->
+\( \eta_{\text{hw}} = \frac{0.28}{989} \approx 0.03\% \)
 
 Computed values: Achieved = 0.28 TFLOP/s, Utilization = 0.03 percent.
 
-<!-- formula-not-decoded -->
+\( \eta_{\text{hw}} = \frac{0.28}{989} \approx 0.03\% \)
 
 The fix targets the Data/Algorithm boundary: increasing the batch size transforms GEMV into GEMM, dramatically raising
 arithmetic intensity and pushing the workload toward compute bound. Other effective strategies include quantization

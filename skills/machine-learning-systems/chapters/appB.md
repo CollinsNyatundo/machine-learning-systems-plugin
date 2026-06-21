@@ -573,7 +573,9 @@ much information is lost if we approximate 𝑃 with 𝑄 (Kullback and Leibler 
 
 ## Napkin Math 18.2: Worked example: KL divergence for drift detection
 
-<!-- formula-not-decoded -->
+\[
+\text{KL Divergence} = \sum_{i=1}^{3} P_i \log \frac{P_i}{Q_i}
+\]
 
 Scenario: Asentiment classifier was trained on data where 60 percent of reviews were positive, 30 percent negative, and
 10 percent neutral. After deployment, the serving distribution shifts to 45 percent positive, 40 percent negative, and
@@ -618,7 +620,7 @@ for softmax. The solution is to compute in log-space: the 'LogSum-Exp' trick all
 ever calculating the massive exponentials directly, preserving numerical precision. 6 The following example shows why
 this trick matters in practice, even for modest logit values:
 
-<!-- formula-not-decoded -->
+\[ \log \left( \frac{\sum_{j} e^{z_j}}{\sum_{j} e^{z_j - \max(z_i)}} \right) = \max(z_i) + \log \left( \frac{\sum_{j} e^{z_j - \max(z_i)}}{\sum_{j} e^{z_j - \max(z_i)}} \right) \]
 
 ## Napkin Math 18.3: Worked example: Log-sum-exp in action
 

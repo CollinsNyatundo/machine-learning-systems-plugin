@@ -414,7 +414,7 @@ small per-category overheads compound into significant throughput loss.
 The fundamental question for any distributed training strategy is: does the computation between synchronization points
 take long enough to hide the communication? The communication-computation ratio ( 𝜌 ) answers this directly:
 
-<!-- formula-not-decoded -->
+\(\rho\)
 
 When 𝜌 < 1, computation dominates and communication can be overlapped. When 𝜌 > 1, the system is communication-bound
 -GPUs spend more time waiting for data than computing on it. Table B.10 shows the ratio for three representative

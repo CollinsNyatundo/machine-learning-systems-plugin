@@ -609,7 +609,7 @@ locality is what makes the algorithm tractable: the entire network never needs t
 function. Instead, each layer computes its own local derivative during the backward pass and multiplies it by the
 gradient flowing in from the layer above.
 
-<!-- formula-not-decoded -->
+\[ \frac{\partial y}{\partial x}=\frac{\partial f_2}{\partial f_1}\cdot\frac{\partial f_1}{\partial x} \]
 
 Modern frameworks use reverse-mode automatic differentiation, which computes gradients for all 𝑁 parameters in a single
 backward pass. The key insight is that starting from the output and working backward (reverse mode) requires one pass
@@ -646,11 +646,11 @@ Notice that computing 𝜕ℒ 𝜕𝑊 2 requires the cached activation ℎ from
 activations must be stored: every layer's weight gradient depends on that layer's input. Now continue backward to the
 first layer. Since ℎ = 𝑥⋅𝑊 1, the same pattern gives:
 
-<!-- formula-not-decoded -->
+\( \frac{\partial \mathcal{L}}{\partial W_2} = h^{\text{T}} \cdot \frac{\partial \mathcal{L}}{\partial y} \)
 
-<!-- formula-not-decoded -->
+\( \frac{\partial \mathcal{L}}{\partial W_1} = x^\top \cdot \frac{\partial \mathcal{L}}{\partial h} \)
 
-<!-- formula-not-decoded -->
+\( \frac{\partial \mathcal{L}}{\partial \mathbf{h}} \cdot \mathbf{W}^\mathrm{T}_2 \)
 
 Eachstep backward requires two things: the gradient flowing in from above ( 𝜕ℒ 𝜕ℎ ) and the activation cached during the
 forward pass ( 𝑥 ). This is why the backward pass costs roughly 2 × the forward pass in compute: at each layer, it

@@ -98,7 +98,7 @@ Algorithm and Machine share the compute term and are separated by which variable
 total operations ( 𝑂 ) is an Algorithm lever, while improving the hardware's peak throughput ( 𝑅 peak ) or utilization (
 𝜂 hw ) is a Machine lever. A.2.1 D·A·M coordination: From sum to max
 
-<!-- formula-not-decoded -->
+\[ T_{\text{pipelined}} = \max\left(\frac{D_{\text{vol}}}{\text{BW}},\;\frac{O}{R_{\text{peak}}\cdot\eta_{\text{hw}}}\right) + L_{\text{lat}} \]
 
 The additive iron law represents sequential execution -the worst case where Data, Algorithm, and Machine take turns.
 Skilled systems engineering transforms the sum into a max:
@@ -106,7 +106,9 @@ Skilled systems engineering transforms the sum into a max:
 The systems engineer's job is to make these components run in parallel, not in series. Table A.2 summarizes key D·A·M
 Coordination techniques:
 
-<!-- formula-not-decoded -->
+\[
+\max\left(\frac{D_{\text{vol}}}{\text{BW}}, \frac{O}{R_{\text{peak}} \eta_{\text{hw}}}\right) + L_{\text{lat}}
+\]
 
 Table A.2: D·A·M Overlap Techniques: Each technique allows one D·A·M axis to execute while another is in flight,
 converting the iron law's additive terms into overlapped terms.

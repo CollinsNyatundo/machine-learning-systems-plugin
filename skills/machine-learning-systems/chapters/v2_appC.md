@@ -53,7 +53,7 @@ two hardware parameters and the message size.
 
 𝛽
 
-<!-- formula-not-decoded -->
+\( T(M) = \alpha + \frac{M}{\beta} \)
 
 E very point-to-point transfer on a network follows the same fundamental pattern: the sender pays a fixed startup cost
 to initiate the message, then transmits the payload at a rate determined by the link's bandwidth. This two-parameter
@@ -89,7 +89,17 @@ bandwidth-dominated: the link is fully utilized, and the only way to go faster i
 
 <!-- image -->
 
-<!-- formula-not-decoded -->
+\[ 
+2 \cdot
+\frac{
+M}{N \cdot \text{BW}} \cdot
+\frac{\text{BW}}{\text{BW} + 2 \alpha (N - 1)}
++ 2 (N - 1)
+\cdot
+\frac{
+\alpha
+}{\text{BW} + 2 \alpha (N - 1)}
+\]
 
 Interpretation: Messages smaller than 250 KB are latency-dominated on IB NDR. Gradient tensors from a single layer of a
 large model are typically 10-100 MB-well above this threshold. Control messages, heartbeats, and barrier
@@ -137,7 +147,7 @@ AllReduce is the workhorse of data-parallel training: every GPU starts with a lo
 ends with the globally reduced (summed) result. The ring algorithm decomposes AllReduce into a ReduceScatter phase
 followed by an AllGather phase. Ring AllReduce
 
-<!-- formula-not-decoded -->
+\( $\frac{(N-1)}{N} \cdot \frac{2(2M + \alpha N + \beta)}{N}$ \)
 
 The factor 2(𝑁 -1)/𝑁 in the bandwidth term approaches 2 as 𝑁 grows-each byte effectively traverses the ring twice (once
 for reduce-scatter, once for all-gather). The latency term grows linearly with 𝑁, which makes the ring algorithm
@@ -178,7 +188,7 @@ C.2.3 ReduceScatter ReduceScatter is the dual of AllGather: each GPU starts with
 in FSDP and ZeRO, replacing the full AllReduce with a cheaper operation when each GPU only needs its own parameter
 shard's gradient.
 
-<!-- formula-not-decoded -->
+\[ T_{\text{ReduceScatter}} = \frac{N-1}{N} \cdot \frac{M}{\beta} + (N-1) \cdot \alpha \]
 
 Ring ReduceScatter 𝑇 reducescatter = 𝑁 -1 𝑁 ⋅ 𝑀 𝛽 +(𝑁 -1)⋅𝛼 (C.6) The symmetry is not a coincidence: ring AllReduce
 decomposes into one ReduceScatter followed by one AllGather, and the costs add up exactly to Equation C.3.
@@ -193,7 +203,7 @@ Although the formula matches AllGather and ReduceScatter in form, the communicat
 AllToAll is a personalized exchange (each GPU sends different data to each peer), which makes it harder to overlap with
 computation and more sensitive to network congestion.
 
-<!-- formula-not-decoded -->
+\[ T_{\text{alltoall}} = \frac{N-1}{N} \frac{M}{\beta} + (N-1)\alpha \]
 
 C.2.5 Broadcast Broadcast sends a single 𝑀 -byte tensor from one root GPU to all 𝑁 -1 others. It is used for
 distributing initial model weights, updated learning rates, and configuration changes during training. Tree Broadcast
@@ -203,7 +213,7 @@ tree broadcast, the full 𝑀 -byte payload is forwarded at each tree level, so 
 along the log 2 𝑁 -level critical path. Segmented or scatter-allgather broadcast variants can reduce the bandwidth term,
 but they require a different algorithm-specific model.
 
-<!-- formula-not-decoded -->
+\( T_{\text{broadcast}} = \log_2 N \left( \alpha + \frac{M}{\beta} \right) \)
 
 ## Collective complexity summary
 
@@ -347,7 +357,7 @@ message size, and the right-hand side simplifies to approximately 𝑇 comm (�
 ≫1 ), this approaches 𝑇 comm (𝑀) -meaning compression is worthwhile as long as the codec overhead is less than the
 uncompressed communication time.
 
-<!-- formula-not-decoded -->
+\( T_{\text{comm}}(M) \cdot \left(1 - \frac{1}{C} \right) \)
 
 ## Napkin Math 21.3: Worked example: Is top-k compression worth it?
 

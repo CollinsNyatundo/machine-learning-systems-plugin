@@ -687,7 +687,7 @@ The ridge point determines the hardware's balance. If a workload's intensity fal
 
 ## LIGHTBULB Batch size controls arithmetic intensity
 
-<!-- formula-not-decoded -->
+\( \frac{\text{FLOPs}}{\text{Bytes Accessed}} \)
 
 For matrix multiplications, arithmetic intensity scales with the batch dimension. When you compute 𝑌 = 𝑋𝑊 where 𝑋 is
 (𝐵×𝐷 in ) and 𝑊 is (𝐷 in ×𝐷 out ) : · FLOPs: 2×𝐵×𝐷 in ×𝐷 out (multiply-adds) · Bytes: Weights are loaded once: 𝐷 in ×𝐷
@@ -727,9 +727,11 @@ Consider the iron law of ML systems (Principle 3) introduced in Section 1.7:
 
 We verify correctness by confirming that every term resolves to Time (seconds) :
 
-<!-- formula-not-decoded -->
+\[
+T = \frac{D_{\text{vol}}}{\text{BW}} + \frac{O}{R_{\text{peak}} \cdot \eta_{\text{hw}}} + L_{\text{lat}}
+\]
 
-<!-- formula-not-decoded -->
+\[ D_{\text{vol}} \cdot \text{BW} + O \cdot R_{\text{peak}} \cdot \eta_{\text{hw}} + L_{\text{lat}} \]
 
 The equation is physically consistent. Apply this technique to any systems equation: if the dimensions do not match, the
 formula is wrong. 'FLOPs' and 'Bandwidth' cannot be traded directly because they have different units. Any such
@@ -786,7 +788,7 @@ because the useful work (training the model) scales up to dwarf the fixed overhe
 
 ## Napkin Math 20.1: The training time equation
 
-<!-- formula-not-decoded -->
+\[2\left(PD\right)\cdot \left(4PD\right) \]
 
 Just as classical architecture has an 'iron law' of performance, Large Language Model training has a fundamental
 governing equation. To estimate training time 𝑇:
@@ -914,7 +916,7 @@ Bandwidth (throughput) and latency (delay) are distinct constraints. Total trans
 For small transfers (for example, single-token inference), latency dominates. For large transfers (for example, loading
 weights), bandwidth dominates.
 
-<!-- formula-not-decoded -->
+\[ T = \text{Latency} + \frac{\text{Data Size}}{\text{Bandwidth}} \]
 
 Consider sending data over a 10 Gbps link with 10 ms ping (latency). The dominant bottleneck depends entirely on the
 transfer size:

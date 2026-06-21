@@ -68,7 +68,7 @@ large-fleet and warehouse-scale experience (Kokolis et al. 2025; Zu et al. 2024;
 assume the steady-state 'useful life' phase of the bathtub curve, where the failure rate is approximately
 constant-neither dominated by infant mortality (early life) nor wear-out (end of life).
 
-<!-- formula-not-decoded -->
+\( \text{MTTF} = \frac{10^9}{\text{FIT}} \)
 
 Table D.1: Component Failure Rates: Order-of-magnitude reference FIT/MTTF in the steady-state useful-life phase.
 Informed by large-GPU research-cluster analysis Kokolis et al. (2025), TPUv4 supercomputer resiliency and operations Zu
@@ -96,7 +96,7 @@ Think of each component as a ticking clock counting down to failure. A node with
 independent clocks-the node fails when the fi rst clock reaches zero. More clocks mean a shorter expected wait. For a
 cluster of 𝑁 identical nodes, the same logic applies one level up:
 
-<!-- formula-not-decoded -->
+\( \text{MTBF}_{\text{cluster}} = \frac{\text{MTBF}_{\text{node}}}{N} \)
 
 MTBFcluster = MTBFnode 𝑁 (D.3) This is the MTBF cascade: reliability degrades linearly with component count at each
 level, and the levels compound. A node with 5,172-hour MTBF sounds reliable. A cluster of 1,250 such nodes has an MTBF
@@ -196,7 +196,7 @@ approximately 14 bytes of persistent state:
 
 𝑚
 
-<!-- formula-not-decoded -->
+\(m\)
 
 𝑣
 
@@ -234,7 +234,7 @@ Step 2: Apply the Young-Daly formula. 𝜏 opt =√2×24.5 s ×4.14 h ×3,600 s/
 checkpoint interval is approximately 14.2 minutes. The overhead from checkpointing alone is opt 2.9 percent of training
 time.
 
-<!-- formula-not-decoded -->
+\( \frac{\delta}{\tau} \approx \)
 
 𝛿/𝜏 ≈ Implication. If the cluster were doubled to 20,000 GPUs, the MTBF would halve, and the optimal interval would
 shrink to 10.1 minutes-checkpointing more frequently because failures happen more often. This illustrates the
@@ -261,7 +261,7 @@ Recovery is not a single event but a pipeline of phases, each with its own time 
 Table D.5: Recovery Time Breakdown: Each phase contributes to the total time between failure and full-speed resumption.
 For the 10K-GPU, 175B-model scenario, replay dominates because it recomputes work lost since the last checkpoint.
 
-<!-- formula-not-decoded -->
+\[ T_{\text{recovery}} = T_{\text{detect}} + T_{\text{reschedule}} + T_{\text{reload}} + T_{\text{replay}} \tag{D.7} \]
 
 | Phase          | Typical Duration   | What Happens                                    |
 |----------------|--------------------|-------------------------------------------------|
@@ -292,7 +292,7 @@ contribute to the final model:
 during each checkpoint write. 2. Recovery overhead ( ∼ 5 percent): Time lost to detection, rescheduling, reloading, and
 replay after each failure.
 
-<!-- formula-not-decoded -->
+\(\frac{1}{T_{\text{wall}}}\)
 
 3. Wasted work: Training steps computed between the last checkpoint and the failure, which must be discarded and
 recomputed.

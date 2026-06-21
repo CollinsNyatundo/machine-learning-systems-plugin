@@ -119,7 +119,7 @@ When 𝑓 compute drops below 0.5, the fleet spends more time on communication a
 This compute-time fraction is not total fleet efficiency; useful fleet efficiency also depends on MFU, scaling
 efficiency, and goodput. The C 3 taxonomy identifies which noncompute term is responsible.
 
-<!-- formula-not-decoded -->
+\(f_{\text{compute}} = \frac{T_{\text{Computation}}}{T_{\text{step}}}\)
 
 E.4 Intersection Landscape Like D·A·M, the C 3 axes interact at their boundaries. Production bottlenecks often sit at an
 intersection where two axes compound.
@@ -323,7 +323,7 @@ terms, scaling-law FLOPs must be converted into raw fleet capacity after MFU, co
 
 <!-- image -->
 
-<!-- formula-not-decoded -->
+\(\text{Effective FLOPS} = \text{Peak} \times \text{MFU} \times \eta_{\text{scaling}} \times \text{Goodput Ratio}\)
 
 The gap between scaling-law predictions and observed training outcomes is, in large part, a C 3 gap. A team that budgets
 10 24 FLOPs for training will actually deliver far fewer effective FLOPs to the model, because each FLOP must survive
@@ -394,7 +394,7 @@ Exercise 4: Anti-pattern detection Acolleague proposes upgrading the cluster's I
 Gbps) because 'training is too slow.' Before approving the network upgrade, what three C 3 diagnostic questions would
 you ask? Map each to its C 3 axis. Answer: Before upgrading the network, ask:
 
-<!-- formula-not-decoded -->
+\( \frac{0.50 \times 0.50 \times 0.85}{1} \)
 
 Exercise 3: Effective FLOPS calculation Ateam provisions 2,048 H100 GPUs. The cluster achieves 50 percent MFU, 50
 percent scaling efficiency, and 85 percent goodput ratio. Calculate the effective FLOPs as a fraction of peak. If a
