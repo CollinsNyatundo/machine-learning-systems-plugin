@@ -124,9 +124,24 @@ cp -r machine-learning-systems-plugin/skills/machine-learning-systems \
 ```
 
 ### MCP Server (Programmatic Access)
+
+The repository includes a ready-to-use Model Context Protocol (MCP) server (`mcp_server.py`) at the root, allowing programmatic integration with tools like Cursor, Windsurf, Claude Code, and Claude Desktop.
+
+To run the server directly:
 ```bash
-# If MCP server script is added (future)
-python machine-learning-systems-plugin/skills/machine-learning-systems/scripts/mcp-server.py
+python mcp_server.py
+```
+
+To install it directly via the `fastmcp` CLI:
+```bash
+# Install to Claude Desktop
+fastmcp install claude-desktop mcp_server.py
+
+# Install to Cursor
+fastmcp install cursor mcp_server.py
+
+# Install to Claude Code
+fastmcp install claude-code mcp_server.py
 ```
 
 ### Manual / Any Editor
@@ -218,10 +233,10 @@ cp -r machine-learning-systems-plugin/skills/machine-learning-systems/chapters \
 
 1. **Source corrections**: Report to upstream textbook at [harvard-edge/cs249r_book](https://github.com/harvard-edge/cs249r_book)
 2. **Plugin improvements**: PRs welcome for:
-   - Additional top-level indices (timeline, concept map, etc.)
-   - MCP server implementation
-   - Better cross-references between Vol 1 ↔ Vol 2
-   - Search/index tooling
+    - Additional top-level indices (timeline, concept map, etc.)
+    - Enhancement of MCP prompts and resources
+    - Better cross-references between Vol 1 ↔ Vol 2
+    - Search/index tooling
 
 ---
 

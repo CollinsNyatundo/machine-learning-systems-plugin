@@ -2,7 +2,7 @@
   "name": "machine-learning-systems",
   "displayName": "Machine Learning Systems",
   "description": "Study and reference guide for Machine Learning Systems design, patterns, architectures, and quantitative invariants. Includes MCP server for universal AI assistant integration.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Collins Nyatundo",
     "email": "cnyagakan@gmail.com"
