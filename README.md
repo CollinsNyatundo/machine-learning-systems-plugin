@@ -203,7 +203,7 @@ cp -r machine-learning-systems-plugin/skills/machine-learning-systems/chapters \
 |-----------|---------|-------------|
 | **Source Textbook** | CC BY-NC-SA 4.0 | "Machine Learning Systems" by Vijay Janapa Reddi, Harvard SEAS — [mlsysbook.ai](https://mlsysbook.ai/) |
 | **Course Material** | Educational | CS 249r: Machine Learning Systems, Harvard |
-| **This Plugin** | MIT | Plugin format, extraction scripts, top-level indices — free to use, modify, distribute |
+| **This Plugin** | CC BY-NC-SA 4.0 | Plugin format, extraction scripts, top-level indices — free to use, modify, distribute |
 | **Docling** | Apache 2.0 | PDF → markdown conversion — [ds4sd/docling](https://github.com/docling-project/docling) |
 
 ### Proper Citation
