@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Machine Learning Systems — MCP Server
-Exposes the complete textbook (44 chapters, 111 definitions, 820 artifacts)
+Exposes the reference collection (44 chapters, 111 definitions, 816 artifacts)
 as MCP tools, resources, and prompts.
 
 Usage:
@@ -14,10 +14,11 @@ Usage:
 """
 
 from __future__ import annotations
-from pathlib import Path
 import json
 import re
 from functools import lru_cache
+from pathlib import Path
+
 from fastmcp import FastMCP
 
 # ── Configuration ──────────────────────────────────────────────
@@ -58,7 +59,6 @@ def _load_chapter_index() -> list[dict]:
             "title": title,
             "volume": vol,
             "size_kb": md.stat().st_size // 1024,
-            "path": str(md)
         })
     return chapters
 
@@ -68,9 +68,12 @@ def _load_glossary_entries() -> list[dict]:
     text = (CHAPTERS_DIR / "glossary.md").read_text(encoding="utf-8")
     entries = []
     parts = text.split("\n---\n")
-    for part in parts[1:]:  # skip header
+    for part in parts:
+        heading = part.find("\n### ")
+        if heading >= 0:
+            part = part[heading + 1 :]
         lines = part.strip().split("\n")
-        if not lines:
+        if not lines or not lines[0].startswith("### "):
             continue
         term = lines[0].replace("### ", "").strip()
         heading = None
@@ -80,7 +83,11 @@ def _load_glossary_entries() -> list[dict]:
             if line.startswith("**Full heading:**"):
                 heading = line.replace("**Full heading:**", "").strip()
             elif line.startswith("**Source:**"):
-                source = line.replace("**Source:**", "").strip().replace("`", "")
+                source_line = line.replace("**Source:**", "").strip()
+                source_part, separator, chapter_part = source_line.partition(" • **Chapter:**")
+                source = source_part.replace("`", "").strip()
+                if separator:
+                    chapter = chapter_part.strip()
             elif line and not line.startswith("**") and not heading:
                 content += line + " "
         entries.append({
@@ -97,9 +104,12 @@ def _load_patterns_index() -> list[dict]:
     text = (CHAPTERS_DIR / "patterns.md").read_text(encoding="utf-8")
     artifacts = []
     parts = text.split("\n---\n")
-    for part in parts[1:]:  # skip header
+    for part in parts:
+        heading = part.find("\n### ")
+        if heading >= 0:
+            part = part[heading + 1 :]
         lines = part.strip().split("\n")
-        if not lines:
+        if not lines or not lines[0].startswith("### "):
             continue
         name = lines[0].replace("### ", "").strip()
         source = None
@@ -108,7 +118,11 @@ def _load_patterns_index() -> list[dict]:
         content = ""
         for line in lines[1:]:
             if line.startswith("**Source:**"):
-                source = line.replace("**Source:**", "").strip().replace("`", "")
+                source_line = line.replace("**Source:**", "").strip()
+                source_part, separator, chapter_part = source_line.partition(" • **Chapter:**")
+                source = source_part.replace("`", "").strip()
+                if separator:
+                    chapter = chapter_part.strip()
             elif line.startswith("**Full heading:**"):
                 version = line.replace("**Full heading:**", "").strip()
             elif line.startswith("**Chapter:**"):
@@ -147,7 +161,7 @@ def glossary() -> str:
 
 @mcp.resource("ml-systems://patterns")
 def patterns() -> str:
-    """All 820 named artifacts across 8 categories."""
+    """All 816 indexed artifacts across 8 categories."""
     return (CHAPTERS_DIR / "patterns.md").read_text(encoding="utf-8")
 
 @mcp.resource("ml-systems://cheatsheet")
@@ -295,8 +309,13 @@ def get_chapter(file: str) -> str:
     Returns:
         Full chapter markdown or error.
     """
-    path = CHAPTERS_DIR / file
-    if not path.exists():
+    requested = Path(file)
+    if requested.name != file or requested.suffix.lower() != ".md":
+        return json.dumps({"error": f"Invalid chapter filename: {file}"})
+
+    root = CHAPTERS_DIR.resolve()
+    path = (root / requested).resolve()
+    if not path.is_relative_to(root) or not path.is_file():
         # List available files
         available = [c["file"] for c in _load_chapter_index()]
         return json.dumps({

@@ -225,7 +225,7 @@ Create `/path/to/mcp_server.py`:
 #!/usr/bin/env python3
 """
 Machine Learning Systems — MCP Server
-Exposes the complete textbook (44 chapters, 111 definitions, 820 artifacts)
+Exposes the reference corpus (44 chapter files, 111 definitions, 816 indexed artifacts)
 as MCP tools, resources, and prompts.
 """
 
@@ -265,7 +265,7 @@ def glossary() -> str:
 
 @mcp.resource("ml-systems://patterns")
 def patterns() -> str:
-    """All 820 artifacts across 8 categories."""
+    """All 816 indexed artifacts across 8 categories."""
     return (CHAPTERS_DIR / "patterns.md").read_text()
 
 @mcp.resource("ml-systems://cheatsheet")
@@ -472,7 +472,7 @@ fastmcp install claude-desktop mcp_server.py
 |----------|-----|---------|
 | Chapter Index | `ml-systems://index` | All 44 chapters metadata |
 | Glossary | `ml-systems://glossary` | 111 definitions |
-| Patterns | `ml-systems://patterns` | 820 artifacts |
+| Patterns | `ml-systems://patterns` | 816 indexed artifacts |
 | Cheatsheet | `ml-systems://cheatsheet` | Formulas, rules |
 
 | Prompt | Use Case |
@@ -507,4 +507,4 @@ fastmcp install claude-desktop mcp_server.py
 
 ## 📚 Source Attribution
 
-All content sourced from **"Machine Learning Systems"** by **Professor Vijay Janapa Reddi** (Harvard SEAS), course **CS 249r**, open-source at **[mlsysbook.ai](https://mlsysbook.ai/)** (CC BY-NC-SA 4.0). Plugin extraction and MCP server are MIT-licensed.
+The reference content is adapted from **"Machine Learning Systems"** by **Professor Vijay Janapa Reddi** (Harvard SEAS), course **CS 249r**, at **[mlsysbook.ai](https://mlsysbook.ai/)**. This redistributed/adapted package, including its plugin and MCP integration, is licensed under CC BY-NC-SA 4.0; third-party dependencies retain their own licenses.
