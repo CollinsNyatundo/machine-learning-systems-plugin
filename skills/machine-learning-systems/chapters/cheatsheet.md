@@ -56,8 +56,8 @@
 - **Vol 1 (21 files):** `chapters/ch01.md` – `ch16.md`, `appA.md`–`appE.md`
 - **Vol 2 (23 files):** `chapters/v2_ch01.md` – `v2_ch18.md`, `v2_appA.md`–`v2_appF.md`
 - **Full Glossary:** `glossary.md` (112 definitions)
-- **All Patterns:** `patterns.md` (820 artifacts)
-- **Total Artifacts:** 820+
+- **All Patterns:** `patterns.md` (816 indexed artifacts)
+- **Total Indexed Artifacts:** 816
 
 ---
 

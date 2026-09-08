@@ -194,10 +194,10 @@ cp -r skills/machine-learning-systems/chapters ~/my-ml-reference/
 |-----------|---------|-------------|
 | **Source Textbook** | CC BY-NC-SA 4.0 | "Machine Learning Systems" by Vijay Janapa Reddi, Harvard SEAS — [mlsysbook.ai](https://mlsysbook.ai/) |
 | **Course Material** | Educational | CS 249r: Machine Learning Systems, Harvard |
-| **Plugin & MCP Server** | MIT | Free to use, modify, distribute |
+| **Plugin & MCP Server** | CC BY-NC-SA 4.0 | Attribution required; noncommercial use; adaptations use the same license |
 | **Docling** | Apache 2.0 | PDF → markdown conversion — [ds4sd/docling](https://github.com/docling-project/docling) |
 | **FastMCP** | MIT | MCP server framework — [gofastmcp.com](https://gofastmcp.com) |
 
 ---
 
-*Generated from the complete "Machine Learning Systems" textbook via deterministic docling extraction. Every definition, formula, worked example, and architectural insight preserved from source.*
+*Derived from "Machine Learning Systems" through document extraction and repository-specific indexing. Consult the upstream textbook when exact source fidelity matters.*
