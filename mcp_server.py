@@ -1,575 +1,526 @@
 #!/usr/bin/env python3
 """
-Machine Learning Systems — MCP Server
-Exposes the reference collection (44 chapters, 111 definitions, 816 artifacts)
-as MCP tools, resources, and prompts.
+Machine Learning Systems - MCP server.
+
+Exposes the reference collection (chapters, definitions, indexed artifacts,
+cheatsheet) as MCP tools, resources and prompts. All content is indexed once
+in memory (see ``mlsys_index.py``); tools return compact structured results by
+default and take ``verbose=True`` for fuller text.
 
 Usage:
-    pip install fastmcp
-    fastmcp run mcp_server.py:mcp                    # stdio (for Hermes install)
+    pip install -r requirements.txt
+    fastmcp run mcp_server.py:mcp                    # stdio
     fastmcp run mcp_server.py:mcp --transport http   # HTTP on port 8000
-    fastmcp install claude-code mcp_server.py
-    fastmcp install cursor mcp_server.py
-    fastmcp install claude-desktop mcp_server.py
+
+Set ML_SYSTEMS_DIR to point at a different ``skills/machine-learning-systems`` directory.
 """
 
 from __future__ import annotations
+
 import json
 import re
-from functools import lru_cache
-from pathlib import Path
+import threading
+from typing import Annotated
 
 from fastmcp import FastMCP
+from fastmcp.exceptions import ToolError
+from pydantic import Field
 
-# ── Configuration ──────────────────────────────────────────────
-# Option 1: Relative to this file (for repo usage)
-CHAPTERS_DIR = Path(__file__).parent / "skills" / "machine-learning-systems" / "chapters"
-
-# Option 2: Absolute path (uncomment and adjust for installed plugin)
-# CHAPTERS_DIR = Path.home() / ".gemini" / "config" / "plugins" / "machine-learning-systems" / "skills" / "machine-learning-systems" / "chapters"
-
-# Verify path exists
-if not CHAPTERS_DIR.exists():
-    # Try common locations
-    for fallback in [
-        Path.cwd() / "skills" / "machine-learning-systems" / "chapters",
-        Path.cwd() / "chapters",
-        Path.home() / ".gemini" / "config" / "plugins" / "machine-learning-systems" / "skills" / "machine-learning-systems" / "chapters",
-    ]:
-        if fallback.exists():
-            CHAPTERS_DIR = fallback
-            break
+from mlsys_index import (
+    KIND_LABELS,
+    Corpus,
+    CorpusError,
+    fts_query,
+    normalize_kind,
+    normalize_volume,
+    summarize,
+)
 
 mcp = FastMCP("Machine Learning Systems")
 
-# ── Helpers ────────────────────────────────────────────────────
+READ_ONLY = {"readOnlyHint": True, "idempotentHint": True, "openWorldHint": False}
 
-@lru_cache(maxsize=1)
-def _load_chapter_index() -> list[dict]:
-    """Load metadata for all chapter files."""
-    chapters = []
-    for md in sorted(CHAPTERS_DIR.glob("*.md")):
-        if md.name in {"SKILL.md", "glossary.md", "patterns.md", "cheatsheet.md"}:
-            continue
-        text = md.read_text(encoding="utf-8")
-        title = text.split("\n")[0].replace("# ", "") if text.startswith("# ") else md.stem
-        vol = "Vol 2" if md.name.startswith("v2_") else "Vol 1"
-        chapters.append({
-            "file": md.name,
-            "title": title,
-            "volume": vol,
-            "size_kb": md.stat().st_size // 1024,
-        })
-    return chapters
+DEFAULT_CHAPTER_CHARS = 20_000
+MAX_CHAPTER_CHARS = 100_000
+MAX_SEARCH_RESULTS = 25
 
-@lru_cache(maxsize=1)
-def _load_glossary_entries() -> list[dict]:
-    """Parse glossary.md into structured entries."""
-    text = (CHAPTERS_DIR / "glossary.md").read_text(encoding="utf-8")
-    entries = []
-    parts = text.split("\n---\n")
-    for part in parts:
-        heading = part.find("\n### ")
-        if heading >= 0:
-            part = part[heading + 1 :]
-        lines = part.strip().split("\n")
-        if not lines or not lines[0].startswith("### "):
-            continue
-        term = lines[0].replace("### ", "").strip()
-        heading = None
-        source = None
-        content = ""
-        for line in lines[1:]:
-            if line.startswith("**Full heading:**"):
-                heading = line.replace("**Full heading:**", "").strip()
-            elif line.startswith("**Source:**"):
-                source_line = line.replace("**Source:**", "").strip()
-                source_part, separator, chapter_part = source_line.partition(" • **Chapter:**")
-                source = source_part.replace("`", "").strip()
-                if separator:
-                    chapter = chapter_part.strip()
-            elif line and not line.startswith("**") and not heading:
-                content += line + " "
-        entries.append({
-            "term": term,
-            "heading": heading,
-            "source": source,
-            "content": content.strip()
-        })
-    return entries
+# ── Corpus access ──────────────────────────────────────────────
 
-@lru_cache(maxsize=1)
-def _load_patterns_index() -> list[dict]:
-    """Parse patterns.md into structured artifacts."""
-    text = (CHAPTERS_DIR / "patterns.md").read_text(encoding="utf-8")
-    artifacts = []
-    parts = text.split("\n---\n")
-    for part in parts:
-        heading = part.find("\n### ")
-        if heading >= 0:
-            part = part[heading + 1 :]
-        lines = part.strip().split("\n")
-        if not lines or not lines[0].startswith("### "):
-            continue
-        name = lines[0].replace("### ", "").strip()
-        source = None
-        version = None
-        chapter = None
-        content = ""
-        for line in lines[1:]:
-            if line.startswith("**Source:**"):
-                source_line = line.replace("**Source:**", "").strip()
-                source_part, separator, chapter_part = source_line.partition(" • **Chapter:**")
-                source = source_part.replace("`", "").strip()
-                if separator:
-                    chapter = chapter_part.strip()
-            elif line.startswith("**Full heading:**"):
-                version = line.replace("**Full heading:**", "").strip()
-            elif line.startswith("**Chapter:**"):
-                chapter = line.replace("**Chapter:**", "").strip()
-            elif line and not line.startswith("**") and not line.startswith("---"):
-                content += line + " "
-        artifacts.append({
-            "name": name,
-            "source": source,
-            "version": version,
-            "chapter": chapter,
-            "content": content.strip()
-        })
-    return artifacts
+_corpus: Corpus | None = None
+_corpus_lock = threading.Lock()
+
+
+def get_corpus() -> Corpus:
+    """Build the index on first use; later calls reuse it."""
+    global _corpus
+    if _corpus is None:
+        with _corpus_lock:
+            if _corpus is None:
+                try:
+                    _corpus = Corpus()
+                except CorpusError as exc:
+                    raise ToolError(str(exc)) from exc
+    return _corpus
+
+
+def reset_corpus(corpus: Corpus | None = None) -> None:
+    """Swap (or clear) the shared index. Used by tests and after content edits."""
+    global _corpus
+    with _corpus_lock:
+        _corpus = corpus
+
+
+def _volume(value: str | int | None) -> int | None:
+    try:
+        return normalize_volume(value)
+    except ValueError as exc:
+        raise ToolError(str(exc)) from exc
+
+
+def _kind(value: str | None) -> str | None:
+    try:
+        return normalize_kind(value)
+    except ValueError as exc:
+        raise ToolError(str(exc)) from exc
+
+
+def _require_text(name: str, value: str, max_len: int = 200) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ToolError(f"'{name}' must be a non-empty string.")
+    return value.strip()[:max_len]
+
+
+def _clamp(value: int, low: int, high: int) -> int:
+    return max(low, min(high, int(value)))
+
+
+def _resolve_chapter(corpus: Corpus, file: str) -> str:
+    """Map 'ch05', 'ch05.md' or 'v2_ch06' to an indexed chapter file name (whitelist lookup)."""
+    name = _require_text("file", file, 100)
+    for candidate in (name, f"{name}.md"):
+        if candidate in corpus.chapters:
+            return candidate
+        lowered = {k.lower(): k for k in corpus.chapters}
+        if candidate.lower() in lowered:
+            return lowered[candidate.lower()]
+    raise ToolError(f"Chapter not found: {file!r}. Available: {', '.join(corpus.chapters)}")
+
 
 # ── Resources ──────────────────────────────────────────────────
 
-@mcp.resource("ml-systems://index")
+
+@mcp.resource("ml-systems://index", mime_type="application/json")
 def chapter_index() -> str:
-    """Complete chapter listing with metadata (44 chapters)."""
-    chapters = _load_chapter_index()
-    vol1 = [c for c in chapters if c["volume"] == "Vol 1"]
-    vol2 = [c for c in chapters if c["volume"] == "Vol 2"]
-    return json.dumps({
-        "total_chapters": len(chapters),
-        "vol1_count": len(vol1),
-        "vol2_count": len(vol2),
-        "vol1": vol1,
-        "vol2": vol2
-    }, indent=2)
+    """Chapter listing with metadata and live corpus counts."""
+    corpus = get_corpus()
+    chapters = list(corpus.chapters.values())
+    by_kind = {kind: 0 for kind in KIND_LABELS}
+    for row in corpus.artifact_rows(None, None):
+        by_kind[row["kind"]] += 1
+    return json.dumps(
+        {
+            "total_chapters": len(chapters),
+            "definitions": by_kind["definition"],
+            "artifacts": sum(by_kind.values()),
+            "artifacts_by_type": by_kind,
+            "volume_1": [c for c in chapters if c["volume"] == 1],
+            "volume_2": [c for c in chapters if c["volume"] == 2],
+        },
+        indent=2,
+        ensure_ascii=False,
+    )
+
 
 @mcp.resource("ml-systems://glossary")
 def glossary() -> str:
-    """All 111 definitions, alphabetical, with Vol 1/Vol 2 disambiguation."""
-    return (CHAPTERS_DIR / "glossary.md").read_text(encoding="utf-8")
+    """Glossary (generated from the chapters' formal definitions)."""
+    return _read_reference("glossary.md")
 
-@mcp.resource("ml-systems://patterns")
+
+@mcp.resource("ml-systems://patterns", mime_type="application/json")
 def patterns() -> str:
-    """All 816 indexed artifacts across 8 categories."""
-    return (CHAPTERS_DIR / "patterns.md").read_text(encoding="utf-8")
+    """Compact catalog of indexed artifacts (titles only). Use get_artifact for text."""
+    corpus = get_corpus()
+    catalog: dict[str, list[dict]] = {kind: [] for kind in KIND_LABELS}
+    for row in corpus.artifact_rows(None, None):
+        catalog[row["kind"]].append(
+            {"id": row["num"], "title": row["title"], "file": row["file"], "volume": row["volume"]}
+        )
+    return json.dumps(catalog, indent=1, ensure_ascii=False)
+
 
 @mcp.resource("ml-systems://cheatsheet")
 def cheatsheet() -> str:
-    """Key formulas, quantitative rules of thumb, hardware constants."""
-    return (CHAPTERS_DIR / "cheatsheet.md").read_text(encoding="utf-8")
+    """Formulas and hardware numbers quick reference."""
+    return _read_reference("cheatsheet.md")
+
 
 @mcp.resource("ml-systems://skill")
 def skill_manifest() -> str:
     """Plugin SKILL.md manifest."""
-    return (CHAPTERS_DIR / "SKILL.md").read_text(encoding="utf-8")
+    return _read_reference("SKILL.md")
+
+
+def _read_reference(name: str) -> str:
+    path = get_corpus().skill_dir / name
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ToolError(f"Reference file unavailable: {name}") from exc
+
 
 # ── Tools ──────────────────────────────────────────────────────
 
-@mcp.tool
-def search_chapters(query: str, volume: str = "both", limit: int = 10) -> str:
-    """
-    Search chapter content by keyword with context.
-    
-    Args:
-        query: Search term (case-insensitive, searches full text)
-        volume: "1" | "2" | "both" (default: both)
-        limit: Max results (default: 10)
-    
-    Returns:
-        JSON with matching sections including file, line number, and context.
-    """
-    results = []
-    vol_prefix = None
-    if volume == "1":
-        vol_prefix = ("ch", "app")
-    elif volume == "2":
-        vol_prefix = ("v2_ch", "v2_app")
-    
-    for md in sorted(CHAPTERS_DIR.glob("*.md")):
-        if md.name in {"SKILL.md", "glossary.md", "patterns.md", "cheatsheet.md"}:
-            continue
-        if vol_prefix and not md.name.startswith(vol_prefix):
-            continue
-        
-        text = md.read_text(encoding="utf-8")
-        lines = text.split("\n")
-        query_lower = query.lower()
-        
-        for i, line in enumerate(lines):
-            if query_lower in line.lower():
-                start = max(0, i - 2)
-                end = min(len(lines), i + 3)
-                context = "\n".join(lines[start:end])
-                results.append({
-                    "file": md.name,
-                    "line": i + 1,
-                    "context": context[:500]
-                })
-                if len(results) >= limit:
-                    break
-        if len(results) >= limit:
-            break
-    
-    return json.dumps({
-        "query": query,
-        "volume_filter": volume,
-        "results": results,
-        "count": len(results)
-    }, indent=2)
 
-@mcp.tool
-def get_definition(term: str) -> str:
-    """
-    Get a glossary definition by term (fuzzy, case-insensitive).
-    
-    Args:
-        term: Term to look up (e.g., "MFU", "Arithmetic Intensity", "Iron Law")
-    
-    Returns:
-        Full definition entry or error with suggestions.
-    """
-    entries = _load_glossary_entries()
-    term_lower = term.lower()
-    
-    # Exact match first
-    for entry in entries:
-        if entry["term"].lower() == term_lower:
-            return json.dumps(entry, indent=2)
-    
-    # Partial match
-    matches = [e for e in entries if term_lower in e["term"].lower()]
-    if matches:
-        return json.dumps({"matches": matches}, indent=2)
-    
-    # Fuzzy: search in content
-    content_matches = [e for e in entries if term_lower in e["content"].lower()]
-    if content_matches:
-        return json.dumps({"content_matches": content_matches[:5]}, indent=2)
-    
-    return json.dumps({
-        "error": f"Definition not found: {term}",
-        "suggestion": "Try search_chapters for broader search",
-        "total_entries": len(entries)
-    }, indent=2)
+@mcp.tool(annotations=READ_ONLY)
+def search_chapters(
+    query: Annotated[str, Field(description="Words to search for, e.g. 'roofline arithmetic intensity'")],
+    volume: Annotated[str, Field(description="'1', '2' or 'both'")] = "both",
+    limit: Annotated[int, Field(description=f"Max results (1-{MAX_SEARCH_RESULTS})")] = 10,
+    verbose: Annotated[bool, Field(description="Longer snippets")] = False,
+) -> dict:
+    """BM25-ranked full-text search over all chapters. Returns compact snippets with file and heading."""
+    text = _require_text("query", query, 300)
+    vol = _volume(volume)
+    limit = _clamp(limit, 1, MAX_SEARCH_RESULTS)
+    results = get_corpus().search(text, vol, limit, 600 if verbose else 240)
+    return {"query": text, "volume": vol or "both", "count": len(results), "results": results}
 
-@mcp.tool
-def get_artifact(artifact_type: str, identifier: str) -> str:
-    """
-    Get a specific artifact from patterns.md.
-    
-    Args:
-        artifact_type: One of: napkin_math, checkpoint, systems_perspective, 
-                       principle, war_story, lighthouse, example, definition
-        identifier: Partial name or number (e.g., "1.1", "MFU", "Ridge Point")
-    
-    Returns:
-        Full artifact entry or error.
-    """
-    artifacts = _load_patterns_index()
-    type_lower = artifact_type.lower().replace("_", " ")
-    id_lower = identifier.lower()
-    
+
+@mcp.tool(annotations=READ_ONLY)
+def get_definition(
+    term: Annotated[str, Field(description="Term to look up, e.g. 'Backpropagation' or 'Iron Law'")],
+    limit: Annotated[int, Field(description="Max matches (1-10)")] = 5,
+    verbose: Annotated[bool, Field(description="Full definition text for every match")] = False,
+) -> dict:
+    """Look up a formal definition. An exact term match returns its full text."""
+    text = _require_text("term", term)
+    limit = _clamp(limit, 1, 10)
+    corpus = get_corpus()
+    defs = corpus.definitions()
+    lowered = text.lower()
+
+    exact = [r for r in defs if r["title"].lower() == lowered]
+    partial = [r for r in defs if r not in exact and lowered in r["title"].lower()]
+    ranked = exact + partial
+    if len(ranked) < limit:
+        match = fts_query(text, "and") or fts_query(text, "or")
+        if match:
+            ids = {r["id"] for r in ranked}
+            for row in corpus.query(
+                "SELECT a.* FROM artifact_fts f JOIN artifacts a ON a.id = f.rowid "
+                "WHERE artifact_fts MATCH ? AND a.kind = 'definition' ORDER BY bm25(artifact_fts, 8.0, 1.0) LIMIT ?",
+                (match, limit),
+            ):
+                if row["id"] not in ids:
+                    ranked.append(row)
+    if not ranked:
+        raise ToolError(f"No definition found for {term!r}. Try search_chapters.")
+
     matches = []
-    for a in artifacts:
-        name_lower = a["name"].lower()
-        content_lower = a["content"].lower()
-        
-        # Match type in name or version
-        if type_lower in name_lower or (a["version"] and type_lower in a["version"].lower()):
-            if id_lower in name_lower or id_lower in content_lower or id_lower in (a["version"] or "").lower():
-                matches.append(a)
-    
-    if matches:
-        return json.dumps({"matches": matches}, indent=2)
-    
-    return json.dumps({
-        "error": f"Artifact not found: {artifact_type} ~ {identifier}",
-        "suggestion": "Use list_artifacts to browse available artifacts"
-    }, indent=2)
+    for i, r in enumerate(ranked[:limit]):
+        full = verbose or (i == 0 and len(exact) == 1)
+        matches.append(
+            {
+                "term": r["title"],
+                "definition_id": r["num"],
+                "volume": r["volume"],
+                "source": r["file"],
+                "chapter": r["chapter"],
+                "definition": summarize(r["body"], 4000 if full else 300),
+                "exact": r in exact,
+            }
+        )
+    return {"query": text, "count": len(matches), "matches": matches}
 
-@mcp.tool
-def get_chapter(file: str) -> str:
-    """
-    Get full chapter content by filename.
-    
-    Args:
-        file: Chapter filename (e.g., "ch04.md", "v2_ch06.md", "appE.md", "v2_appC.md")
-    
-    Returns:
-        Full chapter markdown or error.
-    """
-    requested = Path(file)
-    if requested.name != file or requested.suffix.lower() != ".md":
-        return json.dumps({"error": f"Invalid chapter filename: {file}"})
 
-    root = CHAPTERS_DIR.resolve()
-    path = (root / requested).resolve()
-    if not path.is_relative_to(root) or not path.is_file():
-        # List available files
-        available = [c["file"] for c in _load_chapter_index()]
-        return json.dumps({
-            "error": f"Chapter not found: {file}",
-            "available": available
-        }, indent=2)
-    return path.read_text(encoding="utf-8")
-
-@mcp.tool
-def get_formula(formula_name: str) -> str:
-    """
-    Get a specific formula from cheatsheet.md.
-    
-    Args:
-        formula_name: Formula identifier (e.g., "Iron Law", "MFU", "Ridge Point", "Young-Daly", "KL")
-    
-    Returns:
-        Formula with context or error.
-    """
-    cheatsheet = (CHAPTERS_DIR / "cheatsheet.md").read_text(encoding="utf-8")
-    lines = cheatsheet.split("\n")
-    name_lower = formula_name.lower()
-    
-    for i, line in enumerate(lines):
-        if name_lower in line.lower():
-            start = max(0, i - 1)
-            end = min(len(lines), i + 3)
-            return "\n".join(lines[start:end])
-    
-    # Also check table rows
-    for row in re.findall(r"^\|.*?\|.*?\|", cheatsheet, re.MULTILINE):
-        if name_lower in row.lower():
-            return row
-    
-    return json.dumps({
-        "error": f"Formula not found: {formula_name}",
-        "suggestion": "Try 'Iron Law', 'MFU', 'Ridge Point', 'Young-Daly', 'KL Divergence', 'Arithmetic Intensity'"
-    }, indent=2)
-
-@mcp.tool
-def list_artifacts(artifact_type: str = "all", volume: str = "both", limit: int = 100) -> str:
-    """
-    List all artifacts of a given type, optionally filtered by volume.
-    
-    Args:
-        artifact_type: "all" | "napkin_math" | "checkpoint" | "systems_perspective" | 
-                       "principle" | "war_story" | "lighthouse" | "example" | "definition"
-        volume: "1" | "2" | "both"
-        limit: Max results
-    
-    Returns:
-        JSON list of artifact names.
-    """
-    artifacts = _load_patterns_index()
-    type_lower = artifact_type.lower().replace("_", " ") if artifact_type != "all" else None
-    vol_filter = None
-    if volume == "1":
-        vol_filter = "(Vol 1)"
-    elif volume == "2":
-        vol_filter = "(Vol 2)"
-    
-    results = []
-    for a in artifacts:
-        name = a["name"]
-        version = a["version"] or ""
-        
-        if type_lower and type_lower not in name.lower() and type_lower not in version.lower():
-            continue
-        if vol_filter and vol_filter not in name and vol_filter not in version:
-            continue
-        
-        results.append({
-            "name": name,
-            "source": a["source"],
-            "chapter": a["chapter"]
-        })
-        if len(results) >= limit:
-            break
-    
-    return json.dumps({
-        "type": artifact_type,
-        "volume": volume,
-        "count": len(results),
-        "artifacts": results
-    }, indent=2)
-
-@mcp.tool
-def get_cheatsheet_section(section: str) -> str:
-    """
-    Get a section from cheatsheet.md.
-    
-    Args:
-        section: "key_numbers" | "formulas" | "rules" | "links"
-    
-    Returns:
-        Relevant cheatsheet section.
-    """
-    cheatsheet = (CHAPTERS_DIR / "cheatsheet.md").read_text(encoding="utf-8")
-    sections = {
-        "key_numbers": "## Key Numbers",
-        "formulas": "## Key Formulas",
-        "rules": "## Rules of Thumb",
-        "links": "## Quick Links"
-    }
-    
-    if section not in sections:
-        return json.dumps({
-            "error": f"Unknown section: {section}",
-            "available": list(sections.keys())
-        }, indent=2)
-    
-    header = sections[section]
-    start = cheatsheet.find(header)
-    if start == -1:
-        return json.dumps({"error": f"Section not found: {header}"}, indent=2)
-    
-    # Find next ## header
-    next_header = cheatsheet.find("\n## ", start + 1)
-    if next_header == -1:
-        content = cheatsheet[start:]
+@mcp.tool(annotations=READ_ONLY)
+def get_artifact(
+    artifact_type: Annotated[
+        str, Field(description="napkin_math, systems_perspective, checkpoint, example, lighthouse, war_story, principle, definition")
+    ],
+    identifier: Annotated[str, Field(description="Number like '18.2' or words from the title")],
+    verbose: Annotated[bool, Field(description="Longer text (default is a short excerpt)")] = False,
+) -> dict:
+    """Fetch artifacts by type and number or title (content is not searched; use search_chapters for that)."""
+    kind = _kind(artifact_type)
+    if kind is None:
+        raise ToolError("artifact_type is required (not 'all').")
+    ident = _require_text("identifier", identifier)
+    rows = get_corpus().artifact_rows(kind, None)
+    number = re.fullmatch(r"[A-Za-z]?\d+(?:\.\d+)*", ident)
+    if number:
+        hits = [r for r in rows if r["num"] == ident]
     else:
-        content = cheatsheet[start:next_header]
-    
-    return content.strip()
+        words = [w for w in re.findall(r"\w+", ident.lower())]
+        hits = [r for r in rows if all(w in r["title"].lower() for w in words)]
+    if not hits:
+        raise ToolError(f"No {KIND_LABELS[kind]} matching {identifier!r}. Use list_artifacts to browse.")
+    cap = 6000 if verbose else 1200
+    return {
+        "type": kind,
+        "count": len(hits),
+        "artifacts": [
+            {
+                "id": r["num"],
+                "title": r["title"],
+                "source": r["file"],
+                "volume": r["volume"],
+                "chapter": r["chapter"],
+                "text": summarize(r["body"], cap),
+                "truncated": len(re.sub(r"\s+", " ", r["body"])) > cap,
+            }
+            for r in hits[:5]
+        ],
+    }
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_chapter(
+    file: Annotated[str, Field(description="Chapter file, e.g. 'ch04', 'ch04.md', 'v2_ch06', 'appE'")],
+    section: Annotated[str | None, Field(description="Return only the section whose heading contains this text")] = None,
+    offset: Annotated[int, Field(description="Character offset to continue from (use next_offset)")] = 0,
+    max_chars: Annotated[int, Field(description=f"Page size, up to {MAX_CHAPTER_CHARS}")] = DEFAULT_CHAPTER_CHARS,
+) -> dict:
+    """Read a chapter in pages. The first page (no section) also returns a heading outline for navigation."""
+    corpus = get_corpus()
+    name = _resolve_chapter(corpus, file)
+    lines = corpus.chapter_lines(name)
+    sections = corpus.chapter_sections(name)
+    offset = max(0, int(offset))
+    max_chars = _clamp(max_chars, 500, MAX_CHAPTER_CHARS)
+
+    heading = None
+    if section:
+        needle = section.strip().lower()
+        found = next((s for s in sections if needle in s.heading.lower()), None)
+        if found is None:
+            outline = [s.heading for s in sections if s.level == 2][:60]
+            raise ToolError(f"Section {section!r} not found in {name}. Level-2 headings: {outline}")
+        heading = found.heading
+        text = "\n".join(lines[found.start : found.end])
+    else:
+        text = "\n".join(lines)
+
+    page = text[offset : offset + max_chars]
+    end = offset + len(page)
+    result: dict = {
+        "file": name,
+        "title": corpus.chapters[name]["title"],
+        "section": heading,
+        "total_chars": len(text),
+        "offset": offset,
+        "returned_chars": len(page),
+        "truncated": end < len(text),
+        "next_offset": end if end < len(text) else None,
+        "content": page,
+    }
+    if not section and offset == 0:
+        result["outline"] = [s.heading for s in sections if s.level == 2][:80]
+    return result
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_formula(
+    formula_name: Annotated[str, Field(description="Formula or constant, e.g. 'roofline', 'KV cache', 'H100'")],
+    limit: Annotated[int, Field(description="Max matching cheatsheet sections (1-5)")] = 3,
+) -> dict:
+    """Find formulas and constants in the cheatsheet (ranked). Returns the matching sections."""
+    text = _require_text("formula_name", formula_name)
+    limit = _clamp(limit, 1, 5)
+    corpus = get_corpus()
+    hits: list = []
+    for mode in ("and", "or"):
+        match = fts_query(text, mode)
+        if match:
+            hits = corpus.query(
+                "SELECT section, text FROM cheat_fts WHERE cheat_fts MATCH ? ORDER BY bm25(cheat_fts, 4.0, 1.0) LIMIT ?",
+                (match, limit),
+            )
+        if hits:
+            break
+    if not hits:
+        raise ToolError(f"No cheatsheet entry matches {formula_name!r}. Use get_cheatsheet_section to list sections.")
+    return {
+        "query": text,
+        "count": len(hits),
+        "results": [{"section": h["section"], "text": summarize_block(h["text"], 2500)} for h in hits],
+    }
+
+
+@mcp.tool(annotations=READ_ONLY)
+def list_artifacts(
+    artifact_type: Annotated[str, Field(description="'all' or one type such as napkin_math, checkpoint, war_story")] = "all",
+    volume: Annotated[str, Field(description="'1', '2' or 'both'")] = "both",
+    limit: Annotated[int, Field(description="Page size (1-200)")] = 50,
+    offset: Annotated[int, Field(description="Skip this many entries")] = 0,
+) -> dict:
+    """List artifact titles (no body text). Page with limit/offset; fetch text via get_artifact."""
+    kind, vol = _kind(artifact_type), _volume(volume)
+    limit, offset = _clamp(limit, 1, 200), max(0, int(offset))
+    rows = get_corpus().artifact_rows(kind, vol)
+    page = rows[offset : offset + limit]
+    return {
+        "total": len(rows),
+        "offset": offset,
+        "count": len(page),
+        "next_offset": offset + limit if offset + limit < len(rows) else None,
+        "artifacts": [
+            {"type": r["kind"], "id": r["num"], "title": r["title"], "source": r["file"], "volume": r["volume"]}
+            for r in page
+        ],
+    }
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_cheatsheet_section(
+    section: Annotated[str, Field(description="Part of a section heading, e.g. 'roofline'. Use 'list' to see all headings.")],
+) -> dict:
+    """Return a cheatsheet section by heading text, or list the headings."""
+    text = _require_text("section", section)
+    sections = get_corpus().cheat_sections
+    headings = [s["heading"] for s in sections]
+    if text.lower() in {"list", "all", "*"}:
+        return {"sections": headings}
+    words = re.findall(r"\w+", text.lower())
+    hits = [s for s in sections if all(w in s["heading"].lower() for w in words)]
+    if not hits:
+        raise ToolError(f"No cheatsheet section matches {section!r}. Available: {headings}")
+    return {"sections": [{"heading": s["heading"], "text": s["text"]} for s in hits[:3]]}
+
+
+def summarize_block(text: str, limit: int) -> str:
+    """Trim multi-line text (keeps line breaks, unlike summarize)."""
+    return text if len(text) <= limit else text[:limit].rsplit("\n", 1)[0] + "\n…"
+
 
 # ── Prompts ────────────────────────────────────────────────────
 
+IRON_LAW = r"\( T = \frac{D_{\text{vol}}}{BW} + \frac{O}{R_{\text{peak}} \cdot \eta_{\text{hw}}} + L_{\text{lat}} \)"
+
+
 @mcp.prompt
 def study_chapter(chapter: str) -> str:
-    """
-    Generate a structured study prompt for a chapter.
-    
-    Args:
-        chapter: Chapter file name (e.g., "ch04.md", "v2_ch06.md")
-    """
-    return f"""You are studying Chapter: {chapter} from "Machine Learning Systems" by Vijay Janapa Reddi (Harvard SEAS, CS 249r).
+    """Generate a structured study prompt for one chapter (e.g. "ch04", "v2_ch06")."""
+    corpus = get_corpus()
+    try:
+        name = _resolve_chapter(corpus, chapter)
+    except ToolError as exc:
+        raise ValueError(str(exc)) from exc
+    info = corpus.chapters[name]
+    outline = "\n".join(f"- {s.heading}" for s in corpus.chapter_sections(name) if s.level == 2 and s.heading)[:3000]
+    return f"""You are studying {info['title']} ({name}, Volume {info['volume']}) from "Machine Learning Systems" by Vijay Janapa Reddi (Harvard SEAS, CS 249r).
 
-Please provide a comprehensive study guide with:
+Read the chapter with the get_chapter tool (page through it with next_offset, or pass section=...). Section outline:
+{outline}
 
-1. **Core Concepts** — 3-5 key takeaways from this chapter
-2. **Quantitative Invariants** — All formulas, laws, ridge points, MFU calculations, arithmetic intensity boundaries
-3. **Systems Perspectives** — Architectural insights, trade-offs, design principles
-4. **Napkin Math** — Every worked example with numbers and units
-5. **Checkpoints** — All self-check questions from the chapter
-6. **Cross-References** — How this connects to other chapters (Vol 1 ↔ Vol 2)
-7. **Key Definitions** — All formal definitions introduced
+Produce a study guide with:
+1. **Core Concepts** - 3-5 key takeaways
+2. **Quantitative Invariants** - formulas, laws, ridge points, MFU, arithmetic-intensity boundaries
+3. **Systems Perspectives** - trade-offs and design principles
+4. **Napkin Math** - each worked example with numbers and units
+5. **Checkpoints** - the chapter's self-check questions
+6. **Cross-References** - links to other chapters (Vol 1 and Vol 2)
+7. **Key Definitions** - use get_definition for exact wording
 
-Format as a structured study guide with clear sections. Use the chapter content as the authoritative source. Be specific with numbers, formulas, and quantitative claims."""
+Treat the chapter text as the authoritative source and be specific with numbers."""
+
 
 @mcp.prompt
 def compare_volumes(topic: str) -> str:
-    """
-    Compare how a topic is treated in Vol 1 (single-machine) vs Vol 2 (fleet scale).
-    
-    Args:
-        topic: Topic to compare (e.g., "MFU", "Checkpointing", "Data Loading", "Network Fabrics", "Model Serving")
-    """
-    return f"""Compare the treatment of "{topic}" across both volumes of "Machine Learning Systems" by Vijay Janapa Reddi:
+    """Compare how a topic is treated in Vol 1 (single machine) and Vol 2 (fleet scale)."""
+    topic = _require_text("topic", topic)
+    return f"""Compare the treatment of "{topic}" across both volumes of "Machine Learning Systems" by Vijay Janapa Reddi.
 
-**Vol 1 (Foundations)** — Single-machine perspective
-**Vol 2 (Scale)** — Fleet/distributed perspective
+Use search_chapters(query="{topic}", volume="1") and volume="2", then get_chapter(section=...) for the best hits.
 
-For each volume, extract and compare:
-- Key definitions and formulas
-- Systems perspectives / architectural insights  
-- Quantitative constraints (Iron Law terms: D_vol, BW, R_peak, L_lat, O)
-- Napkin math / worked examples
-- Checkpoints (self-check questions)
-- Principles / invariants
+**Vol 1 (Foundations)** - single-machine perspective
+**Vol 2 (Scale)** - fleet / distributed perspective
 
-Synthesize:
+For each volume extract: key definitions and formulas, systems perspectives, quantitative constraints (Iron Law terms), napkin math, checkpoints, principles.
+
+Then synthesize:
 1. What fundamentally changes at scale?
-2. What invariants remain the same?
+2. What invariants stay the same?
 3. What new constraints emerge in Vol 2?
 4. How do the quantitative trade-offs shift?
 
-Provide specific numbers, formulas, and quantitative comparisons where possible."""
+Give specific numbers and formulas."""
+
 
 @mcp.prompt
 def design_review(system_description: str) -> str:
-    """
-    Use ML Systems principles to review a system design.
-    
-    Args:
-        system_description: Description of the ML system to review
-    """
+    """Review an ML system design using the D-A-M taxonomy and the Iron Law."""
+    system_description = _require_text("system_description", system_description, 8000)
     return f"""You are a Machine Learning Systems expert (per "Machine Learning Systems" by Vijay Janapa Reddi, Harvard SEAS). Review this system design:
 
 {system_description}
 
-Apply the **D·A·M Taxonomy** (Data, Algorithm, Machine) and the **Iron Law of ML Systems**:
-T = D_vol/BW + O/(R_peak·η_hw) + L_lat
+Apply the **D·A·M taxonomy** (Data, Algorithm, Machine) and the **Iron Law of ML Systems**:
+{IRON_LAW}
 
-Analyze across three axes:
+Analyze three axes:
 
-### 1. Data Axis (D_vol, BW)
-- Data volume and movement patterns
-- Bandwidth requirements (memory, network, storage)
-- Data gravity, training-serving skew, feature store needs
-- Pipeline architecture (ETL/ELT, freshness, correctness)
+### 1. Data (\\(D_{{\\text{{vol}}}}\\), \\(BW\\))
+- Data volume and movement, bandwidth needs (memory, network, storage)
+- Data gravity, training-serving skew, feature stores, pipeline freshness and correctness
 
-### 2. Algorithm Axis (O, Arithmetic Intensity)
-- Total operations (O) and compute intensity
-- Ridge point analysis: AI = FLOPs/Byte vs R_peak/BW
-- Critical batch size, MFU targets
-- Model architecture efficiency
+### 2. Algorithm (\\(O\\), arithmetic intensity)
+- Total operations and compute intensity
+- Ridge point: intensity = FLOPs/Byte versus \\(R_{{\\text{{peak}}}}/BW\\)
+- Critical batch size, MFU targets, architecture efficiency
 
-### 3. Machine Axis (R_peak, η_hw, L_lat)
-- Hardware selection and peak throughput
-- Memory wall vs compute wall
-- Latency budget decomposition (L_lat)
-- Hardware utilization (MFU = Achieved/Peak)
+### 3. Machine (\\(R_{{\\text{{peak}}}}\\), \\(\\eta_{{\\text{{hw}}}}\\), \\(L_{{\\text{{lat}}}}\\))
+- Hardware selection, memory wall vs compute wall
+- Latency budget decomposition, utilization (MFU = achieved / peak)
 
-### Scaling Analysis
-- **Bisection bandwidth** for distributed operations
-- **Checkpoint overhead** (Young-Daly: τ_opt = √(2·T_write·MTBF))
-- **MFU ceiling** and utilization gaps
-- **Fault tolerance** (GPU MTBF, fleet reliability)
+### Scaling analysis
+- Bisection bandwidth for distributed operations
+- Checkpoint overhead (Young-Daly optimal interval)
+- MFU ceiling and utilization gaps
+- Fault tolerance (GPU MTBF, fleet reliability)
 
-### Output Required
-1. **Bottleneck identification** — Which axis dominates? Quantify.
-2. **Scaling limits** — At what scale does this break? (GPU count, data volume, model size)
-3. **Quantitative risks** — MTBF, checkpoint storm, ridge point, MFU gap
-4. **Specific mitigations** — Overlap, compression, sparsity, topology, scheduling
-5. **Napkin math** — Back-of-envelope estimates for key metrics
+### Output required
+1. **Bottleneck identification** - which axis dominates, quantified
+2. **Scaling limits** - where the design breaks (GPU count, data volume, model size)
+3. **Quantitative risks** - MTBF, checkpoint storms, ridge point, MFU gap
+4. **Mitigations** - overlap, compression, sparsity, topology, scheduling
+5. **Napkin math** - back-of-envelope estimates for key metrics
 
-Provide specific numbers, formulas, and quantitative claims wherever possible. Reference the textbook's worked examples and principles."""
+Ground claims in the textbook: use search_chapters, get_definition and get_formula."""
+
 
 @mcp.prompt
 def exam_prep(chapters: str = "all") -> str:
-    """
-    Generate exam preparation materials.
-    
-    Args:
-        chapters: Comma-separated chapter files, or "all", "vol1", "vol2"
-    """
-    return f"""Generate comprehensive exam preparation materials for Machine Learning Systems (CS 249r), covering: {chapters}.
+    """Generate exam preparation materials. `chapters`: "all", "vol1", "vol2", or comma-separated chapter files."""
+    corpus = get_corpus()
+    spec = chapters.strip().lower()
+    if spec in {"all", "", "*"}:
+        names = list(corpus.chapters)
+    elif spec in {"vol1", "vol 1", "1"}:
+        names = [n for n, c in corpus.chapters.items() if c["volume"] == 1]
+    elif spec in {"vol2", "vol 2", "2"}:
+        names = [n for n, c in corpus.chapters.items() if c["volume"] == 2]
+    else:
+        try:
+            names = [_resolve_chapter(corpus, part) for part in spec.split(",") if part.strip()]
+        except ToolError as exc:
+            raise ValueError(str(exc)) from exc
+    listing = ", ".join(names)
+    return f"""Generate exam preparation materials for Machine Learning Systems (CS 249r) covering: {listing}.
 
-Include for each chapter:
-1. **Key Definitions** — All formal definitions
-2. **Core Formulas** — Every quantitative relationship
-3. **Napkin Math** — All worked examples with step-by-step
-4. **Checkpoints** — All self-check questions + answers
-5. **Systems Perspectives** — Architectural insights
-6. **Principles** — Invariants and laws
-7. **Cross-Chapter Links** — How concepts connect
+For each chapter (use get_chapter, get_definition, list_artifacts, get_artifact):
+1. **Key Definitions**
+2. **Core Formulas** - every quantitative relationship
+3. **Napkin Math** - worked examples, step by step
+4. **Checkpoints** - self-check questions with answers
+5. **Systems Perspectives** and **Principles**
+6. **Cross-Chapter Links**
 
-Format as a structured study packet with:
-- One-page formula sheet
-- Concept map (D·A·M taxonomy connections)
-- Practice problems with solutions
-- Common pitfalls and misconceptions
+Package as a study packet with a one-page formula sheet, a concept map (D·A·M connections), practice problems with solutions, and common pitfalls.
 
-Focus on quantitative reasoning — this exam tests systems thinking with numbers, not memorization."""
+Focus on quantitative reasoning: the exam tests systems thinking with numbers, not memorization."""
+
 
 # ── Run ────────────────────────────────────────────────────────
 if __name__ == "__main__":

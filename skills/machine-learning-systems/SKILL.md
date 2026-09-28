@@ -21,181 +21,125 @@ Hence, ML engineering is not about making models smaller, but about designing sy
 
 ---
 
-## 📦 Universal Integration: MCP Server
+## MCP Server
 
-This plugin includes a **FastMCP server** (`mcp_server.py`) for integration with **every major AI assistant**.
+The repository root holds a FastMCP server (`mcp_server.py`) that indexes these chapters in memory and serves them to any MCP client. Setup and per-client configuration are in `INTEGRATIONS.md`.
 
-### Quick Install (Any Platform)
+| Type | Names |
+|------|-------|
+| **Tools** | `search_chapters`, `get_definition`, `get_artifact`, `get_chapter`, `get_formula`, `list_artifacts`, `get_cheatsheet_section` |
+| **Resources** | `ml-systems://index`, `ml-systems://glossary`, `ml-systems://patterns`, `ml-systems://cheatsheet`, `ml-systems://skill` |
+| **Prompts** | `study_chapter`, `compare_volumes`, `design_review`, `exam_prep` |
 
-```bash
-# 1. Install dependency
-pip install fastmcp
-
-# 2. Test locally
-fastmcp run mcp_server.py:mcp --transport http --port 8000
-
-# 3. Install into your client
-fastmcp install claude-code mcp_server.py
-fastmcp install cursor mcp_server.py
-fastmcp install claude-desktop mcp_server.py
-```
-
-### Platform-Specific Config
-
-| Platform | Config |
-|----------|--------|
-| **Hermes Agent** | Add to `~/.hermes/config.yaml` under `mcp_servers` |
-| **Claude Code** | `fastmcp install claude-code mcp_server.py` |
-| **Cursor** | `fastmcp install cursor mcp_server.py` |
-| **Claude Desktop** | `fastmcp install claude-desktop mcp_server.py` |
-| **Gemini CLI** | Native plugin (below) OR MCP config |
-| **OpenCode** | Add to `~/.config/opencode/mcp.json` |
-| **Continue.dev** | Add to `~/.continue/config.json` |
-| **Aider** | `export AIDER_MCP_ML_SYSTEMS="fastmcp run mcp_server.py:mcp"` |
-| **Sourcegraph Cody** | Add to `~/.cody/mcp.json` |
-| **Neovim** | Use `mcphub.nvim` or `mcp.nvim` plugin |
-| **Zed Editor** | Add to `~/.config/zed/settings.json` |
-| **VS Code Copilot** | Add to `.vscode/mcp.json` |
-
-### MCP Capabilities
-
-| Type | Count | Examples |
-|------|-------|----------|
-| **Tools** | 7 | `search_chapters`, `get_definition`, `get_artifact`, `get_chapter`, `get_formula`, `list_artifacts`, `get_cheatsheet_section` |
-| **Resources** | 5 | `ml-systems://index`, `ml-systems://glossary`, `ml-systems://patterns`, `ml-systems://cheatsheet`, `ml-systems://skill` |
-| **Prompts** | 4 | `study_chapter`, `compare_volumes`, `design_review`, `exam_prep` |
-
-See `INTEGRATIONS.md` for complete documentation.
+Tools return compact results by default. Pass `verbose=true` for longer text, and page long chapters with `get_chapter(file, section=..., offset=...)`.
 
 ---
 
 ## Global Navigation
 
 ### Supporting Reference Materials
-* [Glossary of Terms & Quantitative Invariants](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/glossary.md)
-* [Architectural Design Patterns Directory](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/patterns.md)
-* [Equations, Napkin Math Constants & Roofline Cheatsheet](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/cheatsheet.md)
+* [Glossary of Terms & Quantitative Invariants](glossary.md)
+* [Architectural Design Patterns Directory](patterns.md)
+* [Equations, Napkin Math Constants & Roofline Cheatsheet](cheatsheet.md)
 
 ---
 
 ## Volume 1: Single-Machine & Local Foundations
 
 ### Part I: Foundations
-* [Chapter 1: Introduction to ML Systems](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch01.md)
-* [Chapter 2: Deployment Paradigms (Cloud, Edge, Mobile, TinyML)](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch02.md)
-* [Chapter 3: The ML Development Lifecycle](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch03.md)
-* [Chapter 4: Data Engineering & Pipeline Architecture](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch04.md)
+* [Chapter 1: Introduction to ML Systems](chapters/ch01.md)
+* [Chapter 2: Deployment Paradigms (Cloud, Edge, Mobile, TinyML)](chapters/ch02.md)
+* [Chapter 3: The ML Development Lifecycle](chapters/ch03.md)
+* [Chapter 4: Data Engineering & Pipeline Architecture](chapters/ch04.md)
 
 ### Part II: Development & Training
-* [Chapter 5: Neural Computation & Training Mechanics](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch05.md)
-* [Chapter 6: Network Architectures (CNNs, Transformers, RecSys)](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch06.md)
-* [Chapter 7: ML Frameworks (TF, PyTorch, JAX)](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch07.md)
-* [Chapter 8: Staged Model Training & Parallelism](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch08.md)
+* [Chapter 5: Neural Computation & Training Mechanics](chapters/ch05.md)
+* [Chapter 6: Network Architectures (CNNs, Transformers, RecSys)](chapters/ch06.md)
+* [Chapter 7: ML Frameworks (TF, PyTorch, JAX)](chapters/ch07.md)
+* [Chapter 8: Staged Model Training & Parallelism](chapters/ch08.md)
 
 ### Part III: Optimize & Accelerate
-* [Chapter 9: Data Selection & Active Learning](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch09.md)
-* [Chapter 10: Model Compression (Pruning, Quantization, Distillation)](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch10.md)
-* [Chapter 11: Hardware Acceleration, Compilers & SoCs](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch11.md)
-* [Chapter 12: Benchmarking Systems & Power Measurement](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch12.md)
+* [Chapter 9: Data Selection & Active Learning](chapters/ch09.md)
+* [Chapter 10: Model Compression (Pruning, Quantization, Distillation)](chapters/ch10.md)
+* [Chapter 11: Hardware Acceleration, Compilers & SoCs](chapters/ch11.md)
+* [Chapter 12: Benchmarking Systems & Power Measurement](chapters/ch12.md)
 
 ### Part IV: Deploy & Operationalize
-* [Chapter 13: Model Serving Systems (LLMs, vLLM, Queuing Theory)](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch13.md)
-* [Chapter 14: ML Operations (MLOps, Drift, Edge Fleets)](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch14.md)
-* [Chapter 15: Responsible Engineering & Compliance](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch15.md)
-* [Chapter 16: Conclusion & Thirteen Quantitative Invariants](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/ch16.md)
+* [Chapter 13: Model Serving Systems (LLMs, vLLM, Queuing Theory)](chapters/ch13.md)
+* [Chapter 14: ML Operations (MLOps, Drift, Edge Fleets)](chapters/ch14.md)
+* [Chapter 15: Responsible Engineering & Compliance](chapters/ch15.md)
+* [Chapter 16: Conclusion & Thirteen Quantitative Invariants](chapters/ch16.md)
 
 ### Appendices (Volume 1)
-* [Appendix A: The D·A·M Taxonomy](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/appA.md)
-* [Appendix B: Data Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/appB.md)
-* [Appendix C: Algorithm Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/appC.md)
-* [Appendix D: Machine Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/appD.md)
-* [Appendix E: System Assumptions](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/appE.md)
+* [Appendix A: The D·A·M Taxonomy](chapters/appA.md)
+* [Appendix B: Data Foundations](chapters/appB.md)
+* [Appendix C: Algorithm Foundations](chapters/appC.md)
+* [Appendix D: Machine Foundations](chapters/appD.md)
+* [Appendix E: System Assumptions](chapters/appE.md)
 
 ---
 
 ## Volume 2: Distributed Infrastructure & Fleet Scaling
 
 ### Part V: The Fleet & Physical Substrate
-* [Chapter 1: Introduction to Fleet Systems](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch01.md)
-* [Chapter 2: Compute Infrastructure](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch02.md)
-* [Chapter 3: Network Fabrics](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch03.md)
-* [Chapter 5: Data Storage](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch05.md)
+> Volume 2 has no Chapter 4 in this collection; the numbering jumps from 3 to 5.
+
+* [Chapter 1: Introduction to ML Systems](chapters/v2_ch01.md)
+* [Chapter 2: Compute Infrastructure](chapters/v2_ch02.md)
+* [Chapter 3: Network Fabrics](chapters/v2_ch03.md)
+* [Chapter 5: Data Storage](chapters/v2_ch05.md)
 
 ### Part VI: Distributed Compute & Distribution Logic
-* [Chapter 6: Distributed Training Systems](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch06.md)
-* [Chapter 7: Collective Communication](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch07.md)
-* [Chapter 8: Fault Tolerance and Reliability](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch08.md)
-* [Chapter 9: Fleet Orchestration](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch09.md)
+* [Chapter 6: Distributed Training Systems](chapters/v2_ch06.md)
+* [Chapter 7: Collective Communication](chapters/v2_ch07.md)
+* [Chapter 8: Fault Tolerance and Reliability](chapters/v2_ch08.md)
+* [Chapter 9: Fleet Orchestration](chapters/v2_ch09.md)
 
 ### Part VII: Serving at Scale
-* [Chapter 10: Performance Engineering](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch10.md)
-* [Chapter 11: Inference at Scale](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch11.md)
-* [Chapter 12: Edge Intelligence](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch12.md)
-* [Chapter 13: ML Operations at Scale](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch13.md)
+* [Chapter 10: Performance Engineering](chapters/v2_ch10.md)
+* [Chapter 11: Inference at Scale](chapters/v2_ch11.md)
+* [Chapter 12: Edge Intelligence](chapters/v2_ch12.md)
+* [Chapter 13: ML Operations at Scale](chapters/v2_ch13.md)
 
 ### Part VIII: Governance & Safety
-* [Chapter 14: Security & Privacy](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch14.md)
-* [Chapter 15: Robust AI](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch15.md)
-* [Chapter 16: Sustainable AI](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch16.md)
-* [Chapter 17: Responsible Engineering](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch17.md)
-* [Chapter 18: Conclusion](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_ch18.md)
+* [Chapter 14: Security & Privacy](chapters/v2_ch14.md)
+* [Chapter 15: Robust AI](chapters/v2_ch15.md)
+* [Chapter 16: Sustainable AI](chapters/v2_ch16.md)
+* [Chapter 17: Responsible Engineering](chapters/v2_ch17.md)
+* [Chapter 18: Conclusion](chapters/v2_ch18.md)
 
 ### Appendices (Volume 2)
-* [Appendix A: Single-Machine Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appA.md)
-* [Appendix B: Fleet Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appB.md)
-* [Appendix C: Communication Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appC.md)
-* [Appendix D: Reliability Foundations](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appD.md)
-* [Appendix E: The C³ Taxonomy](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appE.md)
-* [Appendix F: System Assumptions](file:///C:/Users/COLLINS/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/v2_appF.md)
+* [Appendix A: Single-Machine Foundations](chapters/v2_appA.md)
+* [Appendix B: Fleet Foundations](chapters/v2_appB.md)
+* [Appendix C: Communication Foundations](chapters/v2_appC.md)
+* [Appendix D: Reliability Foundations](chapters/v2_appD.md)
+* [Appendix E: The C³ Taxonomy](chapters/v2_appE.md)
+* [Appendix F: System Assumptions](chapters/v2_appF.md)
 
 ---
 
-## 🔧 Installation Methods
+## Installation
 
-### Gemini CLI (Primary — Native Plugin)
+Clone the whole repository (the MCP server sits beside `skills/`, not inside it):
+
 ```bash
-# Clone repo
 git clone https://github.com/CollinsNyatundo/machine-learning-systems-plugin.git
-
-# Install
-cp -r machine-learning-systems-plugin/skills/machine-learning-systems \
-      ~/.gemini/config/plugins/
-
-# Verify
-ls ~/.gemini/config/plugins/machine-learning-systems/skills/machine-learning-systems/chapters/
+cd machine-learning-systems-plugin
+python -m venv .venv && .venv/bin/pip install -r requirements.txt   # Windows: .venv\Scripts\pip
+python scripts/install.py --dry-run    # preview MCP client configuration
 ```
 
-### MCP Server (Universal — All Platforms)
-```bash
-# Install dependency
-pip install fastmcp
-
-# Run server (stdio for direct install, HTTP for remote)
-fastmcp run mcp_server.py:mcp                    # stdio
-fastmcp run mcp_server.py:mcp --transport http --port 8000  # HTTP
-
-# Install into client
-fastmcp install claude-code mcp_server.py
-fastmcp install cursor mcp_server.py
-fastmcp install claude-desktop mcp_server.py
-```
-
-### Manual / Editor-Agnostic
-```bash
-# Just copy the chapters folder anywhere
-cp -r skills/machine-learning-systems/chapters ~/my-ml-reference/
-```
+For Gemini/Antigravity, place the clone at `~/.gemini/config/plugins/machine-learning-systems`.
 
 ---
 
-## 📚 Source Attribution
+## Source Attribution
 
 | Component | License | Attribution |
 |-----------|---------|-------------|
 | **Source Textbook** | CC BY-NC-SA 4.0 | "Machine Learning Systems" by Vijay Janapa Reddi, Harvard SEAS — [mlsysbook.ai](https://mlsysbook.ai/) |
 | **Course Material** | Educational | CS 249r: Machine Learning Systems, Harvard |
 | **Plugin & MCP Server** | CC BY-NC-SA 4.0 | Attribution required; noncommercial use; adaptations use the same license |
-| **Docling** | Apache 2.0 | PDF → markdown conversion — [ds4sd/docling](https://github.com/docling-project/docling) |
 | **FastMCP** | MIT | MCP server framework — [gofastmcp.com](https://gofastmcp.com) |
 
 ---
