@@ -70,7 +70,7 @@ def fix_text(text: str) -> str:
     lines = text.split("\n")
     out: list[str] = []
     in_fence = False
-    in_display = False
+    in_display = ""  # "" | "dollar" (opened by $$) | "bracket" (opened by \[)
     for line in lines:
         stripped = line.strip()
         if stripped.startswith("```"):
@@ -88,12 +88,18 @@ def fix_text(text: str) -> str:
             continue
 
         if in_display and (not stripped or stripped.startswith("#")):
-            in_display = False  # display math never spans a blank line/heading; recover from unbalanced \[
+            in_display = ""  # display math never spans a blank line/heading; recover from unbalanced openers
 
-        if in_display:
+        if in_display == "dollar":
+            if "$$" in line:
+                in_display = ""
+                line = line.replace("$$", r"\]", 1)
+            out.append(line)
+            continue
+        if in_display == "bracket":
             body = line.replace("$$", "")
             if r"\]" in body:
-                in_display = False
+                in_display = ""
             out.append(body)
             continue
 
@@ -101,11 +107,11 @@ def fix_text(text: str) -> str:
             # multi-line `$$` block opens here (or closes without opener)
             head, _, tail = line.partition("$$")
             out.append(head + r"\[" + tail)
-            in_display = r"\]" not in tail
+            in_display = "" if r"\]" in tail else "dollar"
             continue
 
         if stripped.startswith(r"\[") and r"\]" not in line:
-            in_display = True
+            in_display = "bracket"
             out.append(line)
             continue
 

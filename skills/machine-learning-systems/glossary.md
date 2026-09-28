@@ -796,7 +796,7 @@ Thermal Design Power (TDP) is the maximum sustained thermal load in watts that a
 
 **Definition 8.1** (Vol 1) · [ch08.md](chapters/ch08.md) · Chapter 8: Staged Model Training & Parallelism
 
-**Machine Learning Training Systems** are software-hardware systems that execute the iterative optimization loop—forward pass, loss computation, backward pass, and parameter update—to minimize a loss function over a training dataset. * **Quantitative Significance:** The memory cost of training is typically \(6 \times\) the inference memory footprint per parameter when using the Adaptive Moment Estimation (Adam) optimizer. For a \(7\text{B}\) parameter model: \[ \text{VRAM}_{\text{min}} =…
+**Machine Learning Training Systems** are software-hardware systems that execute the iterative optimization loop—forward pass, loss computation, backward pass, and parameter update—to minimize a loss function over a training dataset. * **Quantitative Significance:** The memory cost of training is typically \(6 \times\) the inference memory footprint per parameter when using the Adaptive Moment Estimation (Adam) optimizer. For a \(7\text{B}\) parameter model:…
 
 ### Training systems
 

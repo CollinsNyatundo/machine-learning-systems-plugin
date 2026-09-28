@@ -258,7 +258,7 @@ The **Iron Law of Training Performance** models the wall-clock execution time of
 
 [ch08.md](chapters/ch08.md) · Vol 1 · Chapter 8: Staged Model Training & Parallelism
 
-**Model FLOPs Utilization (MFU)** is the hardware-agnostic efficiency metric defined as the ratio of useful model computations performed per step to the peak theoretical hardware capability: \[…
+**Model FLOPs Utilization (MFU)** is the hardware-agnostic efficiency metric defined as the ratio of useful model computations performed per step to the peak theoretical hardware capability:…
 
 ### Definition 8.1: Training systems
 
@@ -844,7 +844,7 @@ Theconstants in this appendix are not just for auditing-they are designed for qu
 
 [ch02.md](chapters/ch02.md) · Vol 1 · Chapter 2: Deployment Paradigms (Cloud, Edge, Mobile, TinyML)
 
-**Problem**: Determine whether a remote battery-powered sensor should transmit raw audio data to the cloud or process it locally. **Variables**: * Transmission energy (\(E_{\text{tx}}\)): \(100…
+**Problem**: Determine whether a remote battery-powered sensor should transmit raw audio data to the cloud or process it locally. **Variables**: * Transmission energy (\(E_{\text{tx}}\)):…
 
 ### Napkin Math 2.2: ResNet-50 Inference on Cloud vs. Mobile NPU
 
@@ -2066,7 +2066,7 @@ Thebatchsize trade-off: Larger batches improve hardware efficiency because matri
 
 [ch06.md](chapters/ch06.md) · Vol 1 · Chapter 6: Network Architectures (CNNs, Transformers, RecSys)
 
-Mathematical Formulation: For a convolutional layer with filter w and input x: Applying translation 𝑣 (shift by ) to the input: 𝑇 \(H(l)_{i,j,k} = \sum_{di} \sum_{dj} \sum_{c} W(l)_{di,dj,c,k}…
+Mathematical Formulation: For a convolutional layer with filter w and input x: Applying translation 𝑣 (shift by ) to the input: 𝑇…
 
 ### Systems Perspective 7.1: The ML compiler
 
@@ -3268,7 +3268,7 @@ Consider classifying MNIST digits (784 input pixels, 10 output classes).
 
 [ch06.md](chapters/ch06.md) · Vol 1 · Chapter 6: Network Architectures (CNNs, Transformers, RecSys)
 
-\[ \begin{bmatrix} 0.59 \\ -0.09 \\ 0.45 \end{bmatrix} = \begin{bmatrix} 0.8 & 0.2 & 0.9 & 0.1 \\ 0.3 & 0.8 & 0.4 & 0.2 \\ 0.2 & -0.3 & 0.6 & 0.7 \\ -0.2 & 0.1 & 0.4 & 0.6 \end{bmatrix}…
+…
 
 ### Example 6.3: Equivariance: Feature detection
 
@@ -3662,13 +3662,13 @@ The extreme constraint: Our Keyword Spotting (KWS) Lighthouse (Chapter 6) lives 
 
 [ch11.md](chapters/ch11.md) · Vol 1 · Chapter 11: Hardware Acceleration, Compilers & SoCs
 
-* **ResNet-50 Inference (\(p = 0.95\)):** Assuming an H100 GPU delivers an \(S = 247\times\) speedup over a baseline CPU for matrix math: \[ \text{Speedup} = \frac{1}{(1-0.95) + \frac{0.95}{247}} =…
+* **ResNet-50 Inference (\(p = 0.95\)):** Assuming an H100 GPU delivers an \(S = 247\times\) speedup over a baseline CPU for matrix math:…
 
 ### Lighthouse 11.2: Life of a Tensor (Keyword Spotting Inference)
 
 [ch11.md](chapters/ch11.md) · Vol 1 · Chapter 11: Hardware Acceleration, Compilers & SoCs
 
-Trace of a 31.2 KB tensor (16,000 samples \(\times\) FP16) through the memory hierarchy of an A100 GPU: 1. **DRAM (HBM):** Tensor starts here. Latency: \(\sim 100\) ns to \(300\) ns. Energy: \(\sim…
+Trace of a 31.2 KB tensor (16,000 samples \(\times\) FP16) through the memory hierarchy of an A100 GPU: 1. **DRAM (HBM):** Tensor starts here. Latency: \(\sim 100\) ns to \(300\) ns. Energy:…
 
 ### Lighthouse 11.1: Amdahl's Law on H100
 
@@ -4156,7 +4156,7 @@ Invariant: The maximum speedup of a system is limited by the fraction of the wor
 
 [ch12.md](chapters/ch12.md) · Vol 1 · Chapter 12: Benchmarking Systems & Power Measurement
 
-> **Invariant:** Machine learning systems fail silently when the production data distribution drifts from the training data distribution. This accuracy decay is modeled as: > \[ > \text{Accuracy}(t)…
+> **Invariant:** Machine learning systems fail silently when the production data distribution drifts from the training data distribution. This accuracy decay is modeled as: >…
 
 ### Principle 11: The Training-Serving Skew Law Invariant
 
@@ -4168,7 +4168,7 @@ Invariant: The maximum speedup of a system is limited by the fraction of the wor
 
 [ch12.md](chapters/ch12.md) · Vol 1 · Chapter 12: Benchmarking Systems & Power Measurement
 
-> **Invariant:** In interactive serving, systems must optimize throughput within a strict tail-latency constraint defined by a Service Level Objective (SLO). Latency is governed by: > \[ >…
+> **Invariant:** In interactive serving, systems must optimize throughput within a strict tail-latency constraint defined by a Service Level Objective (SLO). Latency is governed by: >…
 
 ### Principle 13: The Bias Feedback Invariant
 

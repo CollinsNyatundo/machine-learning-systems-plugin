@@ -405,8 +405,8 @@ def study_chapter(chapter: str) -> str:
     corpus = get_corpus()
     try:
         name = _resolve_chapter(corpus, chapter)
-    except ToolError as exc:
-        raise ValueError(str(exc)) from exc
+    except ToolError as exc:  # FastMCP masks prompt exceptions, so answer with a usable message instead
+        return str(exc)
     info = corpus.chapters[name]
     outline = "\n".join(f"- {s.heading}" for s in corpus.chapter_sections(name) if s.level == 2 and s.heading)[:3000]
     return f"""You are studying {info['title']} ({name}, Volume {info['volume']}) from "Machine Learning Systems" by Vijay Janapa Reddi (Harvard SEAS, CS 249r).
@@ -505,7 +505,7 @@ def exam_prep(chapters: str = "all") -> str:
         try:
             names = [_resolve_chapter(corpus, part) for part in spec.split(",") if part.strip()]
         except ToolError as exc:
-            raise ValueError(str(exc)) from exc
+            return str(exc)
     listing = ", ".join(names)
     return f"""Generate exam preparation materials for Machine Learning Systems (CS 249r) covering: {listing}.
 

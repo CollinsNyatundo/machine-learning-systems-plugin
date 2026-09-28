@@ -141,10 +141,14 @@ def clean_text(text: str) -> str:
 
 
 def summarize(text: str, limit: int) -> str:
+    """Whitespace-flattened excerpt of at most ~limit chars that never ends inside a math span."""
     flat = re.sub(r"\s+", " ", text).strip()
     if len(flat) <= limit:
         return flat
     cut = flat[:limit].rsplit(" ", 1)[0]
+    for opener, closer in ((r"\(", r"\)"), (r"\[", r"\]")):
+        if cut.count(opener) > cut.count(closer):
+            cut = cut[: cut.rfind(opener)].rstrip()
     return cut + "…"
 
 
