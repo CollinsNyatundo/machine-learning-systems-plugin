@@ -11,10 +11,6 @@ Appendix E.
 
 ---
 
----
-
-## Section-by-Section Preserve-and-Extend
-
 ## Single-Machine Foundations (D·A·M)
 
 ## Purpose
@@ -43,7 +39,6 @@ or Machine axis. When serving misses a latency target, identify whether the regi
 memory-bound (weight/KV movement), or compute-bound. When cost is exploding, use the D·A·M rubric to ensure that effort
 targets the dominant term, not a nonbottleneck.
 
-<!-- image -->
 
 ## Learning Objectives
 
@@ -57,7 +52,6 @@ targets the dominant term, not a nonbottleneck.
 The Data · Algorithm · Machine (D·A·M) taxonomy is the primary diagnostic framework for ML systems engineering. It
 formalizes the interdependence between information flow, mathematical
 
-<!-- image -->
 
 A
 

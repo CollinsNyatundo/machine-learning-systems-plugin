@@ -16,10 +16,6 @@ upgrading interconnects, or optimize kernels when the real problem is pipeline b
 
 ---
 
----
-
-## Section-by-Section Preserve-and-Extend
-
 ## The C 3 Taxonomy Purpose
 
 In a distributed training cluster, 'it is slow' is even less informative than on a single machine. A4,096-GPU job can
@@ -321,7 +317,6 @@ compute. They usually abstract away systems efficiency: wall-clock time, acceler
 overhead, and scheduler losses enter later when teams provision hardware to deliver the target compute budget. In C 3
 terms, scaling-law FLOPs must be converted into raw fleet capacity after MFU, communication, and goodput losses.
 
-<!-- image -->
 
 \(\text{Effective FLOPS} = \text{Peak} \times \text{MFU} \times \eta_{\text{scaling}} \times \text{Goodput Ratio}\)
 
@@ -359,7 +354,6 @@ bottlenecks spanning intersections. Identify the dominant axis before optimizing
 
 ## Key Takeaways: Where to look first at fleet scale
 
-<!-- image -->
 
 - Measure the C 3 Scorecard (MFU 50 percent, Scaling Efficiency 70 percent, Goodput Ratio > 90 percent) before investing
 in optimizations. · The C 3 tax is multiplicative: Peak FLOPS × MFU × Scaling Efficiency × Goodput Ratio = Effective
@@ -411,7 +405,7 @@ runs sequentially after the backward pass, enabling overlap (a software change) 
 bottleneck entirely-at zero hardware cost. Consider the network upgrade only after enabling overlap and confirming that
 communication still dominates.
 2. 'Whatfraction of step time is spent in AllReduce vs. noncommunication overhead?' -Communication ( 𝐶 2 ) vs.
-Coordination ( 𝐶 3 ) . If AllReduce consumes $>$40 percent of step time, the network upgrade is justified. If, however,
+Coordination ( 𝐶 3 ) . If AllReduce consumes \$>\$40 percent of step time, the network upgrade is justified. If, however,
 most noncompute time is checkpoint writes and failure recovery (Coordination), doubling network bandwidth will have no
 impact on the dominant overhead.
 

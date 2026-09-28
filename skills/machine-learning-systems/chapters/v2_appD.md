@@ -6,8 +6,6 @@ around, no different from heat dissipation or power delivery.
 
 ---
 
-## Section-by-Section Preserve-and-Extend
-
 ## Reliability Foundations
 
 ## Purpose
@@ -39,7 +37,6 @@ D.4.2.
 
 ## D.1 Failure Probability at Scale
 
-<!-- image -->
 
 ## LIGHTBULB Why this matters
 
@@ -52,7 +49,6 @@ before failing. The physics of large-scale systems, however, works against relia
 another opportunity for failure, and the aggregate failure rate scales linearly with component count. This section
 develops the arithmetic that transforms component-level reliability into system-level failure predictions.
 
-<!-- image -->
 
 D
 
@@ -160,7 +156,6 @@ testing essential before admitting nodes to production clusters.
 
 ## D.2 Checkpoint Optimization
 
-<!-- image -->
 
 ## LIGHTBULB Why this matters
 
@@ -223,7 +218,6 @@ distributed storage-all of which improve the Young-Daly result by shrinking the 
 
 ## D.2.3 Worked example: Optimal checkpoint interval
 
-<!-- image -->
 
 ## Example 22.1: Young-Daly: 175B model on a 10,000-GPU cluster
 
@@ -246,7 +240,6 @@ useful forward progress. In such cases, redundancy or elastic training becomes n
 
 ## D.3 Recovery Budgets
 
-<!-- image -->
 
 ## LIGHTBULB Why this matters
 
@@ -303,7 +296,6 @@ days actually requires 33-38 days of wall-clock time. The fleet orchestration st
 focus on narrowing this gapevery percentage point of overhead recovered translates directly to dollars saved and
 training time shortened.
 
-<!-- image -->
 
 ## Systems Perspective 22.1: The hidden cost of scale
 
@@ -315,7 +307,6 @@ parallelism.
 
 ## D.4 Strategy Selection
 
-<!-- image -->
 
 ## LIGHTBULB Why this matters
 

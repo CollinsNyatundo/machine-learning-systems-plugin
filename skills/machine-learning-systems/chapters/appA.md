@@ -41,8 +41,6 @@
 
 ---
 
-## Section-by-Section Preserve-and-Extend
-
 # Appendix A: The D·A·M Taxonomy
 
 ## A.1 Diagnostic Summary
@@ -455,7 +453,7 @@ error floor).
 
 ### Exercise 4: Anti-Pattern Detection
 A colleague proposes upgrading a training cluster from 4 \(\times\) NVIDIA A100 GPUs to 8 \(\times\) H100 GPUs because
-the model training is "too slow." Before approving the $200K capital expenditure, what three diagnostic questions would
+the model training is "too slow." Before approving the \$200K capital expenditure, what three diagnostic questions would
 you ask to evaluate the D·A·M axes?
 
 #### Solution:
@@ -971,10 +969,10 @@ improvement (6.7 percent) falls well short of predicted improvement (15 percent)
 learnable signal from the training distribution.
 
 Exercise four: Anti-pattern detection Acolleague proposes upgrading from 4 × A100 GPUs to 8 × H100 GPUs because training
-is 'too slow.' Before approving the $200K hardware purchase, what three diagnostic questions would you ask? Map each
+is 'too slow.' Before approving the \$200K hardware purchase, what three diagnostic questions would you ask? Map each
 question to the D·A·M axis it investigates.
 
-Answer: Before spending $200K, ask:
+Answer: Before spending \$200K, ask:
 
 1. 'What is the current GPU utilization during training?' → Machine . If utilization is below 80 percent, faster GPUs
 will just idle faster. The bottleneck is elsewhere.

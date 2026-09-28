@@ -29,8 +29,6 @@ Ops Bytes = 2𝑛 3 3𝑛 2 ×2 = 𝑛 3 FLOP/byte This explains several importa
 
 ---
 
-## Section-by-Section Preserve-and-Extend
-
 # Appendix C: Algorithm Foundations
 
 ## Purpose & Systems Perspective

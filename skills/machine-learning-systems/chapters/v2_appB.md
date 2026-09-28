@@ -6,8 +6,6 @@ understanding how communication, computation, and coordination overheads scale.
 
 ---
 
-## Section-by-Section Preserve-and-Extend
-
 ## Fleet Foundations
 
 ## Purpose
@@ -373,7 +371,6 @@ The numbers in the previous section describe what the hardware can do. Scaling p
 whenmoreofit is brought to bear. Three models govern fleet-scale reasoning: Amdahl's Law extended to fleet overhead, the
 communication-computation ratio, and weak scaling behavior.
 
-<!-- image -->
 
 LIGHTBULB Why this matters Atraining job provisioned with 4,096 GPUs achieves only 2.5 × the throughput of a 1,024-GPU
 run. Is this expected? Scaling physics provides the diagnostic tools to determine whether the system is performing as
@@ -445,7 +442,6 @@ Amdahl's Law paints a pessimistic picture because it assumes a fixed problem siz
 often follows weak scaling: the problem size (tokens, data, model parameters) grows proportionally with the number of
 GPUs. Gustafson's Law captures this more optimistic view.
 
-<!-- image -->
 
 The key insight for fleet-scale ML is that weak scaling is not just a mathematical convenience-it reflects reality.
 Engineers do not use 8,192 GPUs to train a 7B model faster; they use them to train a 70B or 700B model in reasonable
@@ -472,7 +468,6 @@ Compute performance ultimately converts to heat, and heat must be removed. At fl
 are not secondary concerns-they determine where construction is feasible, how densely accelerators can be packed, and
 what the operating costs will be. A cluster that is architecturally sound but thermally infeasible cannot be built.
 
-<!-- image -->
 
 Why this matters
 
@@ -530,14 +525,12 @@ translates to millions of dollars per year. Chapter 16 covers the full sustainab
 
 ## B.5 Fallacies and Pitfalls
 
-<!-- image -->
 
 Exclamation-Triangle Fallacy: Adding more GPUs always makes training faster Amdahl's Law caps speedup at 1/𝑠 for a fixed
 workload. At 10 percent serial overhead, no fleet larger than ~10 × the baseline delivers meaningful additional speedup.
 Beyond the Amdahl limit, every additional GPU contributes nearly zero marginal throughput while increasing failure
 probability and communication overhead. The solution is weak scaling: grow the problem to match the hardware.
 
-<!-- image -->
 
 ## Exclamation-Triangle Fallacy: InfiniBand is just fast Ethernet
 
@@ -547,7 +540,6 @@ with orders-of-magnitude higher latency. RoCE (RDMA over Converged Ethernet) bri
 lossless Ethernet configuration (PFC, ECN) that introduces its own failure modes. The choice between InfiniBand and
 Ethernet is a system architecture decision, not a bandwidth selection.
 
-<!-- image -->
 
 ## Exclamation-Triangle Pitfall: Ignoring failure probability at scale
 
@@ -556,7 +548,6 @@ MTBF drops to 6.1 hours (366 minutes). The probability of at least one failure i
 percent. Designing a training system without automated failure recovery at this scale guarantees that every long-running
 job will fail and require manual intervention.
 
-<!-- image -->
 
 ## Exclamation-Triangle Pitfall: Optimizing MFU without considering scaling efficiency
 
@@ -565,7 +556,6 @@ throughput (512 GPU-equivalents of useful work). Scaling efficiency at 1,024 GPU
 throughput is only 256 GPU-equivalentshalf the expected value. MFU and scaling efficiency are independent multiplicative
 factors; optimizing one without measuring the other leads to incorrect capacity estimates.
 
-<!-- image -->
 
 ## Exclamation-Triangle Fallacy: Air cooling is sufficient for AI workloads
 

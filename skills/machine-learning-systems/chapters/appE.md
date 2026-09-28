@@ -40,8 +40,6 @@
 
 ---
 
-## Section-by-Section Preserve-and-Extend
-
 # Appendix E: System Assumptions & Quantitative Constants
 
 This appendix provides a comprehensive reference of the physical constants, hardware specifications, model parameters,
@@ -123,7 +121,7 @@ To compute the raw electricity cost to train a GPT-3 scale model on a reference 
 - **Reference Run Duration**: \(25 \text{ days}\) on \(1024\) A100 accelerators at nominal Model FLOPs Utilization
 (MFU).
 - **Power Draw per A100 (TDP)**: \(400\text{ W} = 0.4\text{ kW}\)
-- **Assumed Electricity Price**: $0.12 / kWh
+- **Assumed Electricity Price**: \$0.12 / kWh
 
 Calculating total energy consumed:
 \[
@@ -406,8 +404,8 @@ Is this workload compute bound or memory-bound? Divide peak FLOPS by memory band
 How much energy would a GPT-3-scale training run cost on the reference cluster? An A100 draws 400 W at TDP. Using 1,024
 A100s as a normalization for a run requiring roughly
 
-3.14×10 23 FLOPs gives ~25 wall-clock days at the assumed utilization. At $0.12/kWh: ~25 wall-clock days × 1,024 A100s ×
-24 h/day × 0.4 kW × $0.12/kWh ≈ ~USD 29,491 in electricity alone-a small fraction of the total cost, which is dominated
+3.14×10 23 FLOPs gives ~25 wall-clock days at the assumed utilization. At \$0.12/kWh: ~25 wall-clock days × 1,024 A100s ×
+24 h/day × 0.4 kW × \$0.12/kWh ≈ ~USD 29,491 in electricity alone-a small fraction of the total cost, which is dominated
 by accelerator amortization. The original GPT-3 run used V100-era infrastructure; this calculation is an A100-equivalent
 reference estimate.
 
