@@ -6,8 +6,6 @@ models allow practitioners to diagnose bottlenecks.
 
 ---
 
-## Section-by-Section Preserve-and-Extend
-
 ## Communication Foundations
 
 ## Purpose
@@ -43,7 +41,6 @@ count.
 - When gradient compression is proposed: Use Section C.5 to run the break-even calculation before committing engineering
 effort. C.1 The 𝛼 -𝛽 Communication Model Systems Perspective 21.1: Why this matters
 
-<!-- image -->
 
 Estimating how long a gradient synchronization will take across 256 GPUs must happen before committing to a cluster
 topology. The 𝛼 -𝛽 model is the 'Roofline for networks': it gives a first-order prediction of transfer time from just
@@ -87,7 +84,6 @@ cross is the point where both terms contribute equally: 𝑀 cross =𝛼×𝛽 (
 latency-dominated: sending more small messages wastes time on repeated startups. Above 𝑀 cross, communication is
 bandwidth-dominated: the link is fully utilized, and the only way to go faster is higher bandwidth.
 
-<!-- image -->
 
 \[ 
 2 \cdot
@@ -128,7 +124,6 @@ point-to-point transfers, and their cost formulas derive directly from the model
 
 ## C.2 Collective Operation Complexity
 
-<!-- image -->
 
 ## Systems Perspective 21.2: Why this matters
 
@@ -147,13 +142,12 @@ AllReduce is the workhorse of data-parallel training: every GPU starts with a lo
 ends with the globally reduced (summed) result. The ring algorithm decomposes AllReduce into a ReduceScatter phase
 followed by an AllGather phase. Ring AllReduce
 
-\( $\frac{(N-1)}{N} \cdot \frac{2(2M + \alpha N + \beta)}{N}$ \)
+\(\frac{(N-1)}{N} \cdot \frac{2(2M + \alpha N + \beta)}{N}\)
 
 The factor 2(𝑁 -1)/𝑁 in the bandwidth term approaches 2 as 𝑁 grows-each byte effectively traverses the ring twice (once
 for reduce-scatter, once for all-gather). The latency term grows linearly with 𝑁, which makes the ring algorithm
 expensive in latency for large GPU counts. Tree AllReduce
 
-<!-- image -->
 
 Ring AllReduce:
 
@@ -240,7 +234,6 @@ algorithm selection trade-off analyzed next.
 
 ## C.3 Algorithm Selection
 
-<!-- image -->
 
 Systems Perspective 21.3: Why this matters
 
@@ -297,7 +290,6 @@ The next section quantifies that cost.
 
 ## C.4 Pipeline Arithmetic
 
-<!-- image -->
 
 Systems Perspective 21.4: Why this matters
 
@@ -341,7 +333,6 @@ of more frequent, smaller communication between stages.
 
 ## C.5 Compression Economics
 
-<!-- image -->
 
 Systems Perspective 21.5: Why this matters Gradient compression promises to reduce communication volume by 10-1000 × ,
 making AllReduce nearly free. Compression, however, has overhead (encoding and decoding time), and it only helps if that
@@ -361,7 +352,6 @@ uncompressed communication time.
 
 ## Napkin Math 21.3: Worked example: Is top-k compression worth it?
 
-<!-- image -->
 
 ## Calculation:
 

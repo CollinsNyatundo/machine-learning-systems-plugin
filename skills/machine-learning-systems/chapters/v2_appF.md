@@ -9,10 +9,6 @@ reasoning can be audited, verified, or updated.
 
 ---
 
----
-
-## Section-by-Section Preserve-and-Extend
-
 ## System Assumptions
 
 ## Purpose
@@ -346,7 +342,7 @@ representative cloud rates; on-premise costs differ in structure (capital expend
 relative magnitudes guide the same capacity planning decisions. Table F.13 lists the pricing assumptions used in Chapter
 13 and Chapter 11.
 
-Table F.13: Fleet-Scale Economic Parameters: GPU rental dominates total cost. At $4/GPU-hour, a 1,024-GPU training run for 30 days costs $4$× 1,024 ×$720 ≈ $2.95M in compute alone. Electricity at $0.12/kWh adds approximately $0.09/GPU-hour for an H100 at TDP (700 W × PUE 1.12 × $0.12), making it roughly 2.4 percent of the rental cost. Egress charges matter for inference serving: at $0.09/GB, serving a model that returns 1 KB per query at 10,000 QPS costs $0.09$× 0.000001 × 10,000 ×$86,400 ≈ $78/day-modest compared to GPU costs but nonnegligible at hyperscale.
+Table F.13: Fleet-Scale Economic Parameters: GPU rental dominates total cost. At \$4/GPU-hour, a 1,024-GPU training run for 30 days costs \(4\)× 1,024 ×\$720 ≈ \$2.95M in compute alone. Electricity at \$0.12/kWh adds approximately \$0.09/GPU-hour for an H100 at TDP (700 W × PUE 1.12 × \$0.12), making it roughly 2.4 percent of the rental cost. Egress charges matter for inference serving: at \$0.09/GB, serving a model that returns 1 KB per query at 10,000 QPS costs \(0.09\)× 0.000001 × 10,000 ×\$86,400 ≈ \$78/day-modest compared to GPU costs but nonnegligible at hyperscale.
 
 | Constant                       |   Value | Unit       |
 |--------------------------------|---------|------------|
@@ -1003,7 +999,6 @@ addressing complex demographic interactions. Appears in: Chapter 17
 multimodal ai AI systems that can process and understand multiple types of data simultaneously, such as text, images,
 audio, and video, enabling more comprehensive understanding and interaction. Appears in: Chapter 1
 
-<!-- image -->
 
 ## N
 
@@ -1025,7 +1020,6 @@ designed to process information more efficiently than traditional digital comput
 non-iid data Non-independent and identically distributed data where samples are not uniformly distributed across devices
 or time, creating challenges for federated learning convergence and generalization. Appears in: Section 12.1.2
 
-<!-- image -->
 
 O
 
@@ -1037,7 +1031,6 @@ sequencing, communication, and resource allocation across distributed intelligen
 
 oxide breakdown The failure of an oxide layer in transistors due to excessive electric field stress, causing permanent
 
-<!-- image -->
 
 P
 
@@ -1263,7 +1256,6 @@ majority voting determining the correct result. Appears in: Chapter 15
 trusted execution environment A secure area within a processor that provides hardware-based protection for code and
 data, ensuring confidentiality and integrity even from privileged system software. Appears in: Chapter 14
 
-<!-- image -->
 
 V
 

@@ -26,8 +26,6 @@
 
 ---
 
-## Section-by-Section Preserve-and-Extend
-
 # Appendix B: Data Foundations
 
 This appendix serves as a systems engineering reference for data pipelines and statistical monitoring in production

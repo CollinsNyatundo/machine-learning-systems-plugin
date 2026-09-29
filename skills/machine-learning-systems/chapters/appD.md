@@ -42,8 +42,6 @@
 
 ---
 
-## Section-by-Section Preserve-and-Extend
-
 # Appendix D: Machine Foundations
 
 ## Purpose & Overview
