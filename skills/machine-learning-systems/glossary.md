@@ -82,7 +82,7 @@ Bandwidth Hierarchy is the physical ordering of data transfer rates across syste
 
 ### Bisection bandwidth
 
-**Definition 4.4** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.4** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 Bisection Bandwidth is a network topology metric defined as the minimum aggregate link capacity crossing any partition that divides the cluster into two equal halves, representing the worst-case throughput ceiling for all-to-all communication patterns such as AllReduce. 1. Significance (quantitative) : Bisection bandwidth directly sets the BW ceiling in the iron law for global synchronization. A 1,024-GPU fat-tree with 400 Gb/s (50 GB/s) links at 1:1 subscription provides 512 × 50 GB/s = 25.6…
 
@@ -94,7 +94,7 @@ Bisection Bandwidth is a network topology metric defined as the minimum aggregat
 
 ### Bulk synchronous parallel (BSP)
 
-**Definition 4.7** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.7** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 Bulk Synchronous Parallel (BSP) is a parallel execution model in which every worker completes a local computation phase, exchanges data with all other workers, and then waits at a global barrier before any worker begins the next phase-making the slowest participant the pacing constraint for the entire cluster. 1. Significance (quantitative) : BSP makes system efficiency 𝜂 scaling directly proportional to the slowest worker: if one GPU in a 1,024-GPU cluster runs 10 percent slower due to thermal…
 
@@ -252,7 +252,7 @@ Dynamic Batching is the runtime optimization of trading Latency for Throughput u
 
 ### Fat-tree
 
-**Definition 4.6** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.6** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 Fat-Tree is a hierarchical network topology in which the number of parallel paths-and therefore aggregate cross-sectional capacity-increases at each switch tier toward the spine, providing full bisection bandwidth and multiple equal-cost routes between any two nodes (Al-Fares et al. 2008). 1. Significance (quantitative) : Ak-ary fat-tree built from radix𝑘 switches supports 𝑘 2 /2 hosts in a two-tier (pod) configuration and 𝑘 3 /4 hosts in a three-tier configuration with full bisection…
 
@@ -360,7 +360,7 @@ Hybrid Machine Learning is the architectural strategy of Hierarchical Distributi
 
 ### Incast
 
-**Definition 4.9** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.9** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 Incast is a many-to-one traffic pattern in which a large number of senders simultaneously transmit data to a single receiver port, concentrating line-rate traffic from multiple sources into a single switch queue and causing buffer overflow even when the rest of the fabric is uncongested. 1. Significance (quantitative) : In the reduce phase of AllReduce, every participating GPU simultaneously sends gradients toward the same aggregation points. With 256 senders each at 50 GB/s targeting one…
 
@@ -542,7 +542,7 @@ Node is a physical server chassis that aggregates multiple accelerators-typicall
 
 ### Non-blocking fabric
 
-**Definition 4.5** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.5** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 Non-blocking Fabric is a network topology in which any permutation of input-output port pairs can communicate simultaneously at full line rate without internal contention, achieved by ensuring that uplink capacity at every switch tier equals or exceeds downlink capacity. 1. Significance (quantitative) : In ML fleets, a non-blocking fabric ensures that AllReduce traffic from any accelerator subset does not compete for shared links, preserving the full BW term of the iron law. A 2:1…
 
@@ -564,7 +564,7 @@ Overfitting is the failure of Generalization caused by memorizing Noise instead 
 
 ### PAM4 signaling
 
-**Definition 4.1** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.1** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 PAM4 Signaling is an electrical modulation scheme that uses four distinct voltage levels to encode two bits per symbol period, doubling the data rate achievable over a given physical medium without requiring a higher symbol rate. 1. Significance (quantitative) : PAM4 enables 400 Gb/s and 800 Gb/s link speeds that sustain the BW required for large-scale gradient synchronization. However, the reduced gap between voltage levels increases susceptibility to noise, requiring Forward Error Correction…
 
@@ -600,7 +600,7 @@ Prefill and Decode Phases are the two distinct computational regimes of transfor
 
 ### Priority flow control
 
-**Definition 4.8** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.8** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 Priority Flow Control (PFC) is a link-layer mechanism that prevents switch buffer overflow by sending PAUSE frames to an upstream sender when a port's queue depth crosses a configured threshold, throttling injection on a per-priority basis without dropping packets. 1. Significance (quantitative) : PFC is the foundation for lossless Ethernet required by RoCEv2 RDMA. A PFC PAUSE frame must reach the upstream sender within one roundtrip time (roughly 1-5 μs at switch-to-switch distances) before…
 
@@ -652,7 +652,7 @@ An **RNN** is a sequence-processing architecture that updates a hidden state vec
 
 ### Remote direct memory access (RDMA)
 
-**Definition 4.2** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.2** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 Remote Direct Memory Access (RDMA) is a networking technology that allows one machine to read or write the memory of another machine directly, bypassing the operating system kernel and CPU of both endpoints by offloading transport processing to the network interface card. 1. Significance (quantitative) : RDMAreduces end-to-end message latency from the 50-100 μs typical of kernel TCP to approximately 1-2 μs, cutting the 𝐿 lat term in the iron law by 25-50 × . For a 175B-parameter model…
 
@@ -834,6 +834,6 @@ Warehouse-Scale Computer (WSC) is a building-scale computing system in which tho
 
 ### α-β model (Hockney Model)
 
-**Definition 4.3** (Vol 2) · [v2_ch03.md](chapters/v2_ch03.md) · Chapter 3: Network Fabrics
+**Definition 4.3** (Vol 2) · [v2_ch04.md](chapters/v2_ch04.md) · Chapter 4: Network Fabrics
 
 1. Significance (quantitative) : Topology choice directly shifts 𝛼 and 𝛽 . An InfiniBand HDR link has 𝛼 ≈ 1𝜇 s and 𝛽 ≈ 25 GB/s, yielding 𝑛 ∗ ≈25 KB: messages smaller than 25 KB are latency-bound and benefit from topology designs that minimize hop count; messages larger than 25 KB are bandwidth-bound and benefit from fat-tree bisection bandwidth. In a ring topology, the worst-case path traverses ⌊𝑁/2⌋ hops, so effective startup latency scales as 𝛼 ring ≈⌊𝑁/2⌋⋅𝛼 hop: for a 64-node ring, 𝛼 ring…
