@@ -82,11 +82,11 @@ Tools return compact results by default. Pass `verbose=true` for longer text, an
 ## Volume 2: Distributed Infrastructure & Fleet Scaling
 
 ### Part V: The Fleet & Physical Substrate
-> Volume 2 has no Chapter 4 in this collection; the numbering jumps from 3 to 5.
+> Volume 2's own table of contents has no distinct Chapter 3 — numbering runs 1, 2, 4, 5. (A stray "Chapter 3" row in the source ToC duplicates Chapter 4's title with no body content of its own.)
 
 * [Chapter 1: Introduction to ML Systems](chapters/v2_ch01.md)
 * [Chapter 2: Compute Infrastructure](chapters/v2_ch02.md)
-* [Chapter 3: Network Fabrics](chapters/v2_ch03.md)
+* [Chapter 4: Network Fabrics](chapters/v2_ch04.md)
 * [Chapter 5: Data Storage](chapters/v2_ch05.md)
 
 ### Part VI: Distributed Compute & Distribution Logic

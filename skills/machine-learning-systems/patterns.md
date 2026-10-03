@@ -538,55 +538,55 @@ Hierarchy-Aware Parallelism is the strategy of mapping different parallel execut
 
 ### Definition 4.1: PAM4 signaling
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 PAM4 Signaling is an electrical modulation scheme that uses four distinct voltage levels to encode two bits per symbol period, doubling the data rate achievable over a given physical medium without…
 
 ### Definition 4.2: Remote direct memory access (RDMA)
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Remote Direct Memory Access (RDMA) is a networking technology that allows one machine to read or write the memory of another machine directly, bypassing the operating system kernel and CPU of both…
 
 ### Definition 4.3: α-β model (Hockney Model)
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 1. Significance (quantitative) : Topology choice directly shifts 𝛼 and 𝛽 . An InfiniBand HDR link has 𝛼 ≈ 1𝜇 s and 𝛽 ≈ 25 GB/s, yielding 𝑛 ∗ ≈25 KB: messages smaller than 25 KB are latency-bound and…
 
 ### Definition 4.4: Bisection bandwidth
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Bisection Bandwidth is a network topology metric defined as the minimum aggregate link capacity crossing any partition that divides the cluster into two equal halves, representing the worst-case…
 
 ### Definition 4.5: Non-blocking fabric
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Non-blocking Fabric is a network topology in which any permutation of input-output port pairs can communicate simultaneously at full line rate without internal contention, achieved by ensuring that…
 
 ### Definition 4.6: Fat-tree
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Fat-Tree is a hierarchical network topology in which the number of parallel paths-and therefore aggregate cross-sectional capacity-increases at each switch tier toward the spine, providing full…
 
 ### Definition 4.7: Bulk synchronous parallel (BSP)
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Bulk Synchronous Parallel (BSP) is a parallel execution model in which every worker completes a local computation phase, exchanges data with all other workers, and then waits at a global barrier…
 
 ### Definition 4.8: Priority flow control
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Priority Flow Control (PFC) is a link-layer mechanism that prevents switch buffer overflow by sending PAUSE frames to an upstream sender when a port's queue depth crosses a configured threshold,…
 
 ### Definition 4.9: Incast
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Incast is a many-to-one traffic pattern in which a large number of senders simultaneously transmit data to a single receiver port, concentrating line-rate traffic from multiple sources into a single…
 
@@ -1418,37 +1418,37 @@ Setup: Training a 175B model on a DGX H100 cluster with 400 Gbps InfiniBand per 
 
 ### Napkin Math 4.2: When does AllReduce become the bottleneck?
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Step 1: Compute time per iteration. Assume each GPU processes a synthetic microbatch requiring 5×10 13 FLOPs, chosen to produce an approximately 100 ms compute phase for this bottleneck example. At…
 
 ### Napkin Math 4.3: Bisection bandwidth: The cost of oversubscription
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Problem: Acluster designer is choosing between a 'Non-blocking' (1:1) fat-tree and a 'Costoptimized' (4:1) spine for a 1024-GPU cluster. How much slower will a 100 GB-per-GPU AllReduce be on the…
 
 ### Napkin Math 4.4: The rail-optimized dividend
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Problem: A team is synchronizing per-rank data-parallel gradients across 128 nodes. In a standard fat-tree, each message between same-rank GPUs traverses a Leaf switch and a Spine switch (2 hops). In…
 
 ### Napkin Math 4.5: The bisection bottleneck
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Problem: Acluster has 1,024 accelerators across 128 nodes. Each accelerator has 400 Gb/s (50 GB/s) network injection bandwidth. An AllReduce job requires full bisection bandwidth. Scenario A…
 
 ### Napkin Math 4.6: The probability of a PFC storm
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Problem: A4096-GPU RoCE cluster is in operation. If the probability of a single transceiver degrading and triggering PFC pauses is just 0.001% per day, what is the chance of a cluster-wide 'PFC…
 
 ### Napkin Math 4.7: Napkin math: The optical dividend
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Problem: Calculate the power savings of moving a 51.2 Tbps switch from pluggable transceivers to Co-Packaged Optics (CPO). 1. Pluggable Architecture: 128 ports × 20 W = 2.56 kW for optics alone. 2.…
 
@@ -2316,19 +2316,19 @@ The economics of ML infrastructure create a self-reinforcing advantage for organ
 
 ### Systems Perspective 4.1: The network as a gradient bus
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 In a single machine, the memory bus moves data between the processor and memory. In a distributed training cluster, the network fabric serves the analogous role: it is the Gradient Bus that moves…
 
 ### Systems Perspective 4.2: The cost of distance
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 In an ML fleet, distance is money. A 10,000-GPU cluster requires ~20,000 optical links at the spine layer alone. At \$500 each with 10 W per link, that represents \$10 million in cabling and 200 kW…
 
 ### Systems Perspective 4.3: InfiniBand vs. RoCE: The industry verdict
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 The coexistence of InfiniBand (NVIDIA DGX SuperPOD) and RoCE (Meta Grand Teton, Google) in production reflects a genuine trade-off rather than a clear winner. InfiniBand provides 30 to 50 percent…
 
@@ -2962,37 +2962,37 @@ Your team needs to train a 70B-parameter model on 1 trillion tokens within 4 wee
 
 ### Checkpoint 4.1: Protocol selection
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Consider a 2,048-GPU training cluster that will run both large language model training (gradient messages of several gigabytes) and reinforcement learning (frequent small control messages). 1. Which…
 
 ### Checkpoint 4.2: Fat-tree topologies
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Verify your understanding of hierarchical switch fabrics: - □ In a Radix-64 two-tier fat-tree, what is the maximum number of GPUs you can connect without core switches? - □ Why does a Non-blocking…
 
 ### Checkpoint 4.3: Rail-optimized networks
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Verify your understanding of workload-specific network design: - □ Which dimension of 3D Parallelism (TP, PP, or DP) is the primary beneficiary of a RailOptimized design? - □ Why does a…
 
 ### Checkpoint 4.4: Topology selection
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 The choice of network topology dictates the upper bound of training efficiency. Consider three workloads: 1. For a standard data-parallel job, bandwidth is dominated by AllReduce. Which topology…
 
 ### Checkpoint 4.5: Topology selection for your workload
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 You are designing the network for a new ML cluster that will run two primary workloads: (1) training a 175B-parameter language model using 3D parallelism (tensor, pipeline, and data parallelism), and…
 
 ### Checkpoint 4.6: Diagnosing a training slowdown
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Scenario: Your 175B model training job has been running for 3 days on 512 GPUs. You notice that the iteration time has gradually increased from 4.2 seconds to 4.8 seconds (a 14 percent slowdown). The…
 
@@ -3774,7 +3774,7 @@ While Archetype A (GPT-4) is primarily throughput-bound (demanding more TFLOPS),
 
 ### Lighthouse 4.1: Archetype A (GPT-4/Llama-3): The rail-optimized fleet
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Archetype A (GPT-4) is the primary driver for rail-optimized fabrics. Because it uses 3D Parallelism, it generates two distinct traffic patterns: (1) massive, bandwidth-hungry gradient averaging for…
 
@@ -4000,7 +4000,7 @@ In one of the early large-scale training deployments, a 512-GPU cluster experien
 
 ### War Story 4.1: The PFC storm that froze a cluster (2022)
 
-[v2_ch03.md](chapters/v2_ch03.md) · Vol 2 · Chapter 3: Network Fabrics
+[v2_ch04.md](chapters/v2_ch04.md) · Vol 2 · Chapter 4: Network Fabrics
 
 Context: Alarge RoCE-based training cluster connected over 4,096 GPUs through a standard 400 GbE fabric with Priority Flow Control enabled for lossless RDMA. Failure: Asingle malfunctioning…
 

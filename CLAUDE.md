@@ -34,4 +34,4 @@ uv pip install --python .venv/Scripts/python.exe -r requirements-dev.txt   # fas
 
 Math is `\( ... \)` inline and `\[ ... \]` display only. Bare `$`/`$$` are forbidden outside code fences; literal prices are `\$`. Workflow after editing chapters: `scripts/fix_content.py` (idempotent normalizer), then `scripts/build_indexes.py`, then `scripts/validate_content.py`. `tests/test_content.py` enforces all of it.
 
-Known, documented gaps (not bugs to silently "fix"): raw Unicode math glyphs remain in many passages; Vol 2 has no chapter 4 and `v2_ch03.md` uses 4.x numbering; 21 chapters include a verbatim "Full Slice Content" section after the condensed text; `docs/books/` PDFs are git-ignored originals.
+Known, documented gaps (not bugs to silently "fix"): raw Unicode math glyphs remain in many passages; Vol 2's own table of contents has no distinct Chapter 3 (numbering runs 1, 2, 4, 5 — a stray ToC row, no missing content); 21 chapters include a verbatim "Full Slice Content" section after the condensed text; `docs/books/` PDFs are git-ignored originals.

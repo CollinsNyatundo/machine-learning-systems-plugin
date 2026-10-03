@@ -65,7 +65,7 @@ Chapters are the single source of truth. `glossary.md` and `patterns.md` are gen
 - Math uses `\( ... \)` (inline) and `\[ ... \]` (display) only. Bare `$` and `$$` are not allowed; literal dollar amounts are written `\$`.
 - After editing chapters: `python scripts/fix_content.py` (normalizes delimiters and strips extraction artifacts), then `python scripts/build_indexes.py`, then `python scripts/validate_content.py`.
 
-Known gaps in the extracted text: many Volume 1 and Volume 2 passages still contain raw Unicode math glyphs (for example `𝜏 opt`) instead of LaTeX; `v2_ch03.md` is titled Chapter 3 but its headings are numbered 4.x; chapter files begin with an extracted table of contents, and 21 of them also carry a verbatim "Full Slice Content" extraction after the condensed text, so some topics appear twice in search results. The original PDFs, when you have them, belong in `docs/books/` (ignored by git).
+Known gaps in the extracted text: many Volume 1 and Volume 2 passages still contain raw Unicode math glyphs (for example `𝜏 opt`) instead of LaTeX; Volume 2's own table of contents has no distinct Chapter 3 (numbering runs 1, 2, 4, 5 — a stray ToC row duplicates Chapter 4's title with no body of its own); chapter files begin with an extracted table of contents, and 21 of them also carry a verbatim "Full Slice Content" extraction after the condensed text, so some topics appear twice in search results. The original PDFs, when you have them, belong in `docs/books/` (ignored by git).
 
 ## Verify
 
